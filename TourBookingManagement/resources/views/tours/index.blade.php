@@ -1,12 +1,21 @@
+{{-- 
+    Tours Index Page - "Find Tours"
+    File: resources/views/tours/index.blade.php
+    Controller: TourController@index (mengirim data $tours dengan pagination)
+    Routes: GET /tours -> tours.index
+    Purpose: Menampilkan daftar tour yang tersedia dengan filtering dan sorting
+--}}
+
 @extends('layouts.app')
 
 @section('title', 'Find Tours - TourBooking')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    {{-- HEADER --}}
+    {{-- ==================== HEADER SECTION ==================== --}}
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            {{-- Judul halaman --}}
             <div>
                 <h1 class="text-3xl md:text-4xl font-extrabold text-[#010d4c]">
                     Discover Your Next Tour
@@ -15,6 +24,7 @@
                     Browse our available tours and book your next adventure.
                 </p>
             </div>
+            {{-- Counter jumlah tour --}}
             <div class="flex items-center gap-2 text-sm text-gray-500">
                 <i class="fas fa-info-circle text-primary"></i>
                 <span>Showing {{ $tours->total() }} tour(s)</span>
@@ -22,12 +32,14 @@
         </div>
     </div>
 
-    {{-- FILTERS --}}
+    {{-- ==================== FILTER SECTION ==================== --}}
     <form action="{{ route('tours.index') }}" method="GET" class="card-custom mb-8">
+        {{-- Header filter --}}
         <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between gap-4">
             <h2 class="text-lg font-semibold text-[#010d4c]">
                 Filters
             </h2>
+            {{-- Link untuk clear filter jika ada filter aktif --}}
             @if(request('search') || request('sort'))
                 <a href="{{ route('tours.index') }}"
                    class="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
@@ -36,8 +48,10 @@
                 </a>
             @endif
         </div>
+        
+        {{-- Form filter fields --}}
         <div class="px-6 py-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            {{-- Search --}}
+            {{-- Search input --}}
             <div>
                 <label for="search" class="block text-xs font-semibold text-gray-600 mb-1">Search</label>
                 <div class="relative">
@@ -55,7 +69,7 @@
                 </div>
             </div>
 
-            {{-- Sort --}}
+            {{-- Sort dropdown --}}
             <div>
                 <label for="sort" class="block text-xs font-semibold text-gray-600 mb-1">Sort by</label>
                 <select
@@ -69,7 +83,7 @@
                 </select>
             </div>
 
-            {{-- Submit --}}
+            {{-- Submit button --}}
             <div class="flex md:justify-end">
                 <button type="submit"
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-lg btn-primary-custom text-sm">
@@ -80,28 +94,33 @@
         </div>
     </form>
 
-    {{-- TOUR GRID --}}
+    {{-- ==================== TOUR LIST SECTION ==================== --}}
+    {{-- Conditional: Jika ada tour --}}
     @if($tours->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {{-- Loop melalui setiap tour --}}
             @foreach($tours as $tour)
                 <div class="card-custom overflow-hidden flex flex-col h-full">
-                    {{-- Thumbnail --}}
+                    {{-- Thumbnail image --}}
                     @if($tour->thumbnail)
                         <img src="{{ asset('storage/' . $tour->thumbnail) }}"
                              alt="{{ $tour->name }}"
                              class="w-full h-40 object-cover">
                     @else
+                        {{-- Placeholder jika tidak ada thumbnail --}}
                         <div class="w-full h-40 bg-indigo-50 flex items-center justify-center">
                             <i class="fas fa-map-marked-alt text-3xl text-indigo-300"></i>
                         </div>
                     @endif
 
-                    {{-- Content --}}
+                    {{-- Tour content --}}
                     <div class="p-5 flex flex-col flex-1">
+                        {{-- Header dengan nama dan status --}}
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="text-lg font-semibold text-gray-900 line-clamp-1">
                                 {{ $tour->name }}
                             </h3>
+                            {{-- Status badge: Active/Inactive --}}
                             @if($tour->is_active)
                                 <span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[11px] font-semibold">
                                     Active
@@ -113,6 +132,7 @@
                             @endif
                         </div>
 
+                        {{-- Location --}}
                         <p class="text-sm text-gray-500 flex items-center mb-3">
                             <i class="fas fa-map-marker-alt text-primary text-xs mr-1.5"></i>
                             <span class="line-clamp-1">
@@ -120,19 +140,23 @@
                             </span>
                         </p>
 
+                        {{-- Tour details grid --}}
                         <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+                            {{-- Price --}}
                             <div>
                                 <p class="text-xs text-gray-400 uppercase mb-0.5">Price</p>
                                 <p class="font-semibold text-gray-900">
                                     Rp {{ number_format($tour->price, 0, ',', '.') }}
                                 </p>
                             </div>
+                            {{-- Duration --}}
                             <div>
                                 <p class="text-xs text-gray-400 uppercase mb-0.5">Duration</p>
                                 <p class="font-semibold text-gray-900">
                                     {{ $tour->duration_days ?? '-' }} days
                                 </p>
                             </div>
+                            {{-- Jumlah schedule (jika ada) --}}
                             @if(isset($tour->schedules_count))
                                 <div class="col-span-2 mt-1">
                                     <p class="text-xs text-gray-400 uppercase mb-0.5">Schedules</p>
@@ -144,14 +168,16 @@
                             @endif
                         </div>
 
-                        {{-- Actions --}}
+                        {{-- Action buttons --}}
                         <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+                            {{-- View details link --}}
                             <a href="{{ route('tours.show', $tour) }}"
                                class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark">
                                 View Details
                                 <i class="fas fa-arrow-right text-xs"></i>
                             </a>
 
+                            {{-- Book button (hanya untuk tour aktif) --}}
                             @if($tour->is_active)
                                 <a href="{{ route('tours.show', $tour) }}"
                                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg btn-primary-custom text-xs font-semibold">
@@ -165,8 +191,9 @@
             @endforeach
         </div>
 
-        {{-- PAGINATION --}}
+        {{-- ==================== PAGINATION SECTION ==================== --}}
         <div class="flex items-center justify-between text-sm text-gray-600">
+            {{-- Pagination info --}}
             <div>
                 Showing
                 <span class="font-semibold">{{ $tours->firstItem() }}</span>
@@ -176,12 +203,13 @@
                 <span class="font-semibold">{{ $tours->total() }}</span>
                 results
             </div>
+            {{-- Pagination links --}}
             <div class="flex">
                 {{ $tours->links() }}
             </div>
         </div>
     @else
-        {{-- EMPTY STATE --}}
+        {{-- ==================== EMPTY STATE SECTION ==================== --}}
         <div class="card-custom py-12 flex flex-col items-center justify-center">
             <div class="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                 <i class="fas fa-search text-gray-400 text-2xl"></i>

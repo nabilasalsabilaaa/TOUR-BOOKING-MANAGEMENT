@@ -4,11 +4,15 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
+    {{-- =========================
+        PAGE HEADER (TITLE + ACTIONS)
+    ========================== --}}
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            {{-- Judul halaman + info tour --}}
             <div class="mb-4 md:mb-0">
                 <div class="flex items-center">
+                    {{-- Tombol kembali ke daftar tour --}}
                     <a href="{{ route('admin.tours.index') }}" class="mr-4 text-gray-500 hover:text-gray-700 transition-colors">
                         <i class="fas fa-arrow-left"></i>
                     </a>
@@ -18,11 +22,14 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Aksi cepat di header (lihat semua tour + tambah jadwal baru untuk tour ini) --}}
             <div class="flex space-x-3">
                 <a href="{{ route('admin.tours.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center transition">
                     <i class="fas fa-list mr-2"></i>
                     View All Tours
                 </a>
+                {{-- Shortcut langsung buat Schedule baru dengan query ?tour=id --}}
                 <a href="{{ route('admin.schedules.create') }}?tour={{ $tour->id }}" class="btn-primary-custom px-4 py-2 text-white rounded-lg flex items-center transition">
                     <i class="fas fa-calendar-plus mr-2"></i>
                     Add Schedule
@@ -32,8 +39,12 @@
     </div>
 
     <div class="max-w-6xl mx-auto">
-        <!-- Tour Statistics -->
+        {{-- =========================
+            STATISTIK RINGKAS TOUR
+           (Booking, Schedule, Revenue, Status)
+        ========================== --}}
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            {{-- Total bookings untuk tour ini --}}
             <div class="tour-stats rounded-xl p-6 text-white">
                 <div class="flex justify-between items-start">
                     <div>
@@ -46,6 +57,7 @@
                 </div>
             </div>
             
+            {{-- Jumlah schedule aktif untuk tour ini --}}
             <div class="card-custom p-6">
                 <div class="flex justify-between items-start">
                     <div>
@@ -58,6 +70,7 @@
                 </div>
             </div>
             
+            {{-- Akumulasi total revenue dari semua booking tour ini --}}
             <div class="card-custom p-6">
                 <div class="flex justify-between items-start">
                     <div>
@@ -72,6 +85,7 @@
                 </div>
             </div>
             
+            {{-- Status aktif/nonaktif tour --}}
             <div class="card-custom p-6">
                 <div class="flex justify-between items-start">
                     <div>
@@ -87,9 +101,11 @@
             </div>
         </div>
 
-        <!-- Form Card -->
+        {{-- =========================
+            FORM EDIT TOUR
+        ========================== --}}
         <div class="card-custom p-8">
-            <!-- Form Header -->
+            {{-- Judul section form --}}
             <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
                 <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary-light mr-4">
                     <i class="fas fa-edit text-primary text-xl"></i>
@@ -100,14 +116,17 @@
                 </div>
             </div>
 
+            {{-- Form utama edit tour --}}
             <form action="{{ route('admin.tours.update', $tour) }}" method="POST" enctype="multipart/form-data" class="prevent-multiple-submit">
                 @csrf
                 @method('PUT')
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Left Column - Main Information -->
+                    {{-- =========================
+                        KOLOM KIRI: DATA TEKS TOUR
+                    ========================== --}}
                     <div class="lg:col-span-2 space-y-6">
-                        <!-- Tour Name -->
+                        {{-- Nama Tour --}}
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <i class="fas fa-route mr-2 text-primary"></i>
@@ -123,6 +142,7 @@
                                     <i class="fas fa-signature"></i>
                                 </div>
                             </div>
+                            {{-- Pesan error validasi nama --}}
                             @error('name')
                                 <p class="mt-2 text-sm text-error flex items-center">
                                     <i class="fas fa-exclamation-circle mr-2"></i>
@@ -131,7 +151,7 @@
                             @enderror
                         </div>
 
-                        <!-- Description -->
+                        {{-- Deskripsi Tour --}}
                         <div>
                             <label for="description" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <i class="fas fa-align-left mr-2 text-primary"></i>
@@ -142,8 +162,12 @@
                                       placeholder="Describe the tour experience, highlights, and what customers can expect">{{ old('description', $tour->description) }}</textarea>
                             <div class="flex justify-between items-center mt-1">
                                 <p class="text-xs text-gray-500">Provide a compelling description to attract customers</p>
-                                <span id="char-count" class="text-xs text-gray-500">{{ strlen(old('description', $tour->description)) }} characters</span>
+                                {{-- Pakai (string) supaya aman kalau description null --}}
+                                <span id="char-count" class="text-xs text-gray-500">
+                                    {{ strlen((string) old('description', $tour->description)) }} characters
+                                </span>
                             </div>
+                            {{-- Pesan error validasi deskripsi --}}
                             @error('description')
                                 <p class="mt-2 text-sm text-error flex items-center">
                                     <i class="fas fa-exclamation-circle mr-2"></i>
@@ -152,9 +176,9 @@
                             @enderror
                         </div>
 
-                        <!-- Location, Price, Duration, Capacity Grid -->
+                        {{-- Grid: Location, Price, Duration, Capacity --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Location -->
+                            {{-- Lokasi Tour --}}
                             <div>
                                 <label for="location" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                     <i class="fas fa-map-marker-alt mr-2 text-primary"></i>
@@ -177,13 +201,14 @@
                                 @enderror
                             </div>
 
-                            <!-- Price -->
+                            {{-- Harga Tour --}}
                             <div>
                                 <label for="price" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                     <i class="fas fa-tag mr-2 text-primary"></i>
                                     Price *
                                 </label>
                                 <div class="relative">
+                                    {{-- Prefix Rp di sebelah kiri input --}}
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span class="text-gray-500">Rp</span>
                                     </div>
@@ -201,7 +226,7 @@
                                 @enderror
                             </div>
 
-                            <!-- Duration -->
+                            {{-- Durasi dalam hari --}}
                             <div>
                                 <label for="duration_days" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                     <i class="far fa-clock mr-2 text-primary"></i>
@@ -224,7 +249,7 @@
                                 @enderror
                             </div>
 
-                            <!-- Capacity -->
+                            {{-- Kapasitas maksimal per schedule --}}
                             <div>
                                 <label for="capacity" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                     <i class="fas fa-users mr-2 text-primary"></i>
@@ -249,7 +274,7 @@
                             </div>
                         </div>
 
-                        <!-- Active Status -->
+                        {{-- Checkbox status aktif/nonaktif tour --}}
                         <div class="flex items-start pt-4 border-t border-gray-200">
                             <div class="flex items-center h-5">
                                 <input type="checkbox" name="is_active" id="is_active" value="1" 
@@ -262,6 +287,7 @@
                                 </label>
                                 <p class="text-sm text-gray-500 mt-1">
                                     When checked, this tour will be visible to customers for booking.
+                                    {{-- Peringatan kalau sudah ada booking aktif --}}
                                     @if($tour->bookings_count > 0)
                                         <span class="text-warning font-medium">Note: There are active bookings for this tour.</span>
                                     @endif
@@ -276,9 +302,11 @@
                         @enderror
                     </div>
 
-                    <!-- Right Column - Image Upload & Preview -->
+                    {{-- =========================
+                        KOLOM KANAN: GAMBAR & PREVIEW
+                    ========================== --}}
                     <div class="space-y-6">
-                        <!-- Current Image -->
+                        {{-- Thumbnail lama (kalau ada) --}}
                         @if($tour->thumbnail)
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
@@ -297,13 +325,14 @@
                             </div>
                         @endif
 
-                        <!-- Thumbnail Upload -->
+                        {{-- Upload thumbnail baru --}}
                         <div>
                             <label for="thumbnail" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <i class="fas fa-upload mr-2 text-primary"></i>
                                 New Thumbnail Image
                             </label>
                             <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                                {{-- Area klik & drag-drop untuk upload --}}
                                 <div id="upload-area" class="cursor-pointer">
                                     <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
                                     <p class="text-sm text-gray-600">
@@ -323,7 +352,7 @@
                             @enderror
                         </div>
 
-                        <!-- New Image Preview -->
+                        {{-- Preview gambar baru setelah dipilih --}}
                         <div id="image-preview-container" class="hidden">
                             <label class="block text-sm font-medium text-gray-700 mb-3">New Image Preview</label>
                             <div class="relative">
@@ -338,7 +367,7 @@
                             <p class="text-xs text-gray-500 mt-2">This will replace the current image when you update</p>
                         </div>
 
-                        <!-- Price Preview -->
+                        {{-- Preview harga dan durasi seperti yang akan dilihat user --}}
                         <div class="price-preview rounded-lg p-4 text-white">
                             <h3 class="font-semibold mb-2">Price Preview</h3>
                             <div class="text-2xl font-bold" id="price-preview">
@@ -350,18 +379,20 @@
                             <p class="text-xs opacity-80 mt-2">As displayed to customers</p>
                         </div>
 
-                        <!-- Quick Actions -->
+                        {{-- Quick actions terkait schedule tour --}}
                         <div class="bg-white border border-gray-200 rounded-lg p-4">
                             <h4 class="text-sm font-medium text-gray-800 mb-3 flex items-center">
                                 <i class="fas fa-bolt mr-2 text-primary"></i>
                                 Quick Actions
                             </h4>
                             <div class="space-y-2">
+                                {{-- Tambah schedule baru untuk tour ini --}}
                                 <a href="{{ route('admin.schedules.create') }}?tour={{ $tour->id }}" 
                                    class="w-full flex items-center justify-center px-3 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition">
                                     <i class="fas fa-calendar-plus mr-2"></i>
                                     Add Schedule
                                 </a>
+                                {{-- Lihat semua schedule untuk tour ini --}}
                                 <a href="{{ route('admin.schedules.index') }}?tour={{ $tour->id }}" 
                                    class="w-full flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition">
                                     <i class="fas fa-list mr-2"></i>
@@ -372,7 +403,7 @@
                     </div>
                 </div>
 
-                <!-- Submit Buttons -->
+                {{-- Tombol aksi form: Cancel & Update --}}
                 <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
                     <a href="{{ route('admin.tours.index') }}" 
                        class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center transition">
@@ -388,7 +419,10 @@
             </form>
         </div>
 
-        <!-- Danger Zone -->
+        {{-- =========================
+            DANGER ZONE (DELETE TOUR)
+           Hanya bisa delete kalau belum ada booking
+        ========================== --}}
         @if($tour->bookings_count == 0)
         <div class="card-custom p-6 mt-6 border border-red-200">
             <div class="flex items-center mb-4">
@@ -405,6 +439,7 @@
                     <h4 class="font-medium text-gray-900">Delete this tour</h4>
                     <p class="text-sm text-gray-600">Once deleted, this tour and all its schedules cannot be recovered.</p>
                 </div>
+                {{-- Form delete tour --}}
                 <form action="{{ route('admin.tours.destroy', $tour) }}" method="POST" class="inline">
                     @csrf
                     @method('DELETE')
@@ -418,6 +453,7 @@
             </div>
         </div>
         @else
+        {{-- Info kalau tidak bisa delete karena masih ada booking --}}
         <div class="card-custom p-6 mt-6 border border-yellow-200">
             <div class="flex items-center">
                 <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-50 mr-3">
@@ -447,11 +483,13 @@
         --tb-bg-soft: #eef2ff;
     }
 
+    /* Checkbox custom warna biru dark project */
     .checkbox-custom:checked {
         background-color: var(--tb-primary);
         border-color: var(--tb-primary);
     }
     
+    /* Sedikit animasi hover untuk preview image baru */
     .image-preview {
         transition: all 0.3s ease;
     }
@@ -460,16 +498,19 @@
         transform: scale(1.05);
     }
     
+    /* Card "Price Preview" di sidebar */
     .price-preview {
         background: #010d4c;
         box-shadow: 0 15px 35px rgba(1, 13, 76, 0.35);
     }
     
+    /* Card statistik di atas form */
     .tour-stats {
         background: #010d4c;
         box-shadow: 0 15px 35px rgba(55, 65, 81, 0.28);
     }
 
+    /* Card wrapper umum */
     .card-custom {
         background: #ffffff;
         border-radius: 18px;
@@ -477,6 +518,7 @@
         box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
     }
 
+    /* Tombol utama biru gradien */
     .btn-primary-custom {
         background: linear-gradient(135deg, var(--tb-primary) 0%, var(--tb-primary-dark) 100%);
         color: #ffffff;
@@ -504,35 +546,62 @@
 
 @push('scripts')
 <script>
-    // Character count for description
+    // =========================
+    // 1. Character count untuk description
+    // =========================
     const description = document.getElementById('description');
     const charCount = document.getElementById('char-count');
     
-    description.addEventListener('input', function() {
-        charCount.textContent = this.value.length + ' characters';
-    });
+    if (description && charCount) {
+        description.addEventListener('input', function() {
+            charCount.textContent = this.value.length + ' characters';
+        });
+        // Trigger sekali di awal supaya sinkron dengan nilai awal textarea
+        description.dispatchEvent(new Event('input'));
+    }
 
-    // Image upload handling
+    // =========================
+    // 2. Image upload handling (klik & drag-drop)
+    // =========================
     const uploadArea = document.getElementById('upload-area');
     const thumbnailInput = document.getElementById('thumbnail');
     const imagePreview = document.getElementById('image-preview');
     const imagePreviewContainer = document.getElementById('image-preview-container');
     const removeImageBtn = document.getElementById('remove-image');
 
-    if (uploadArea) {
+    // Fungsi helper untuk update preview gambar baru
+    function updateImagePreview(file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            if (imagePreview && imagePreviewContainer) {
+                imagePreview.src = e.target.result;
+                imagePreviewContainer.classList.remove('hidden');
+            }
+        }
+        
+        reader.readAsDataURL(file);
+    }
+
+    // Event klik + drag-drop hanya dijalankan kalau elemen ada
+    if (uploadArea && thumbnailInput) {
+        // Klik area upload -> trigger input file
         uploadArea.addEventListener('click', function() {
             thumbnailInput.click();
         });
 
+        // Saat file di-drag ke atas area upload
         uploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
             uploadArea.classList.add('border-primary', 'bg-primary-light', 'bg-opacity-10');
         });
 
+        // Saat drag keluar dari area upload
         uploadArea.addEventListener('dragleave', function() {
             uploadArea.classList.remove('border-primary', 'bg-primary-light', 'bg-opacity-10');
         });
 
+        // Saat file dijatuhkan (drop)
         uploadArea.addEventListener('drop', function(e) {
             e.preventDefault();
             uploadArea.classList.remove('border-primary', 'bg-primary-light', 'bg-opacity-10');
@@ -542,52 +611,55 @@
                 updateImagePreview(e.dataTransfer.files[0]);
             }
         });
+
+        // Kalau user pilih file via file picker biasa
+        thumbnailInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                updateImagePreview(this.files[0]);
+            }
+        });
     }
 
-    thumbnailInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            updateImagePreview(this.files[0]);
-        }
-    });
-
-    if (removeImageBtn) {
+    // Tombol X untuk menghapus preview gambar baru
+    if (removeImageBtn && thumbnailInput && imagePreviewContainer) {
         removeImageBtn.addEventListener('click', function() {
             thumbnailInput.value = '';
             imagePreviewContainer.classList.add('hidden');
         });
     }
 
-    function updateImagePreview(file) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            imagePreview.src = e.target.result;
-            imagePreviewContainer.classList.remove('hidden');
-        }
-        
-        reader.readAsDataURL(file);
-    }
-
-    // Price and duration preview
-    const priceInput = document.getElementById('price');
-    const durationInput = document.getElementById('duration_days');
-    const pricePreview = document.getElementById('price-preview');
+    // =========================
+    // 3. Price & duration live preview
+    // =========================
+    const priceInput      = document.getElementById('price');
+    const durationInput   = document.getElementById('duration_days');
+    const pricePreview    = document.getElementById('price-preview');
     const durationPreview = document.getElementById('duration-preview');
 
+    // Update preview harga dalam format Rp xxx.xxx
     function updatePricePreview() {
+        if (!priceInput || !pricePreview) return;
         const price = priceInput.value ? parseInt(priceInput.value).toLocaleString('id-ID') : '0';
         pricePreview.textContent = 'Rp ' + price;
     }
 
+    // Update teks durasi (1 day tour / X days tour)
     function updateDurationPreview() {
+        if (!durationInput || !durationPreview) return;
         const days = durationInput.value || 1;
         durationPreview.textContent = days + (days == 1 ? ' day tour' : ' days tour');
     }
 
-    priceInput.addEventListener('input', updatePricePreview);
-    durationInput.addEventListener('input', updateDurationPreview);
+    // Pasang event listener kalau elemennya ada
+    if (priceInput && pricePreview) {
+        priceInput.addEventListener('input', updatePricePreview);
+    }
 
-    // Initialize on page load
+    if (durationInput && durationPreview) {
+        durationInput.addEventListener('input', updateDurationPreview);
+    }
+
+    // Inisialisasi preview saat page pertama kali load
     updatePricePreview();
     updateDurationPreview();
 </script>

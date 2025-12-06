@@ -1,29 +1,45 @@
+{{-- 
+    Home Page View
+    File: resources/views/home.blade.php
+    Extends: layouts/app.blade.php (main layout dengan navbar/footer)
+    Controller: HomeController@index (mengirim data $popularTours)
+--}}
+
+{{-- Extend dari layout utama aplikasi (bukan guest layout) --}}
 @extends('layouts.app')
 
+{{-- Set title halaman --}}
 @section('title', 'Home - TourBooking System')
 
+{{-- Mulai section content utama --}}
 @section('content')
 
 @php
-    // Gambar hero – taruh di public/images/hero-tour2.png
+    // Path gambar hero - pastikan file ada di public/images/hero-tour2.png
+    // asset() helper akan generate URL lengkap ke file tersebut
     $heroImage = asset('images/hero-tour2.png');
 @endphp
 
-<!-- Hero Section -->
+<!-- ==================== HERO SECTION ==================== -->
+{{-- 
+    Hero section dengan background image full-width
+    Menggunakan teknik overlay gelap untuk meningkatkan keterbacaan teks
+--}}
 <section
     class="relative text-white py-20 lg:py-32 bg-cover bg-center"
     style="background-image: url('{{ $heroImage }}');"
 >
-    <!-- Overlay -->
-    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+    <!-- Overlay gelap transparan di atas background image -->
+    <div class="absolute inset-0 bg-black bg-opacity-20"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 items-center">
-            <!-- LEFT (kosong biar teks geser ke kanan) -->
+            <!-- Kolom kiri: Kosong, digunakan untuk mendorong konten ke kanan -->
             <div class="hidden lg:block"></div>
 
-            <!-- RIGHT Content -->
+            <!-- Kolom kanan: Konten utama hero -->
             <div class="text-left lg:text-right">
+                {{-- Judul utama dengan gradient text --}}
                 <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                     Discover Your Next
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400">
@@ -31,13 +47,16 @@
                     </span>
                 </h1>
 
+                {{-- Deskripsi hero --}}
                 <p class="text-xl md:text-2xl mb-8 max-w-xl ml-auto opacity-90">
                     Jelajahi destinasi impianmu dengan paket tur terbaik dari 
                     <span class="font-semibold">TourBooking</span>.
                     Easy planning, safe trip, unforgettable memories.
                 </p>
 
+                {{-- CTA Buttons --}}
                 <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                    {{-- Button untuk guest dan user --}}
                     <a href="#tours"
                        class="bg-white text-primary-dark px-8 py-4 rounded-lg font-semibold text-lg
                               hover:bg-opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
@@ -45,7 +64,9 @@
                         Explore Tours
                     </a>
 
+                    {{-- Conditional button berdasarkan status autentikasi --}}
                     @guest
+                        {{-- Untuk pengunjung belum login: arahkan ke register --}}
                         <a href="{{ route('register') }}"
                            class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg
                                   hover:bg-white hover:text-primary transition-all duration-300 transform hover:-translate-y-1">
@@ -53,6 +74,7 @@
                             Get Started
                         </a>
                     @else
+                        {{-- Untuk user sudah login: arahkan ke daftar tour --}}
                         <a href="{{ route('tours.index') }}"
                            class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg
                                   hover:bg-white hover:text-primary transition-all duration-300 transform hover:-translate-y-1">
@@ -66,9 +88,14 @@
     </div>
 </section>
 
-<!-- Features Section -->
+<!-- ==================== FEATURES SECTION ==================== -->
+{{-- 
+    Section untuk menampilkan fitur-fitur utama platform
+    Menggunakan card dengan hover effect
+--}}
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {{-- Header section --}}
         <div class="text-center mb-16">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 Kenapa harus <span class="text-primary-dark">TourBooking?</span>
@@ -79,7 +106,9 @@
             </p>
         </div>
         
+        {{-- Grid 3 kolom untuk fitur-fitur --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {{-- Fitur 1: Safe & Secure --}}
             <div class="text-center p-6 card-custom hover:transform hover:-translate-y-2 transition-all duration-300">
                 <div class="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-shield-alt text-white text-2xl"></i>
@@ -91,6 +120,7 @@
                 </p>
             </div>
             
+            {{-- Fitur 2: Best Prices --}}
             <div class="text-center p-6 card-custom hover:transform hover:-translate-y-2 transition-all duration-300">
                 <div class="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-tag text-white text-2xl"></i>
@@ -102,6 +132,7 @@
                 </p>
             </div>
             
+            {{-- Fitur 3: 24/7 Support --}}
             <div class="text-center p-6 card-custom hover:transform hover:-translate-y-2 transition-all duration-300">
                 <div class="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-headset text-white text-2xl"></i>
@@ -109,16 +140,22 @@
                 <h3 class="text-xl font-semibold text-gray-900 mb-3">24/7 Support</h3>
                 <p class="text-gray-600">
                     Tim support ready kapan saja kamu butuh bantuan —
-                    sebelum, saat, dan setelah trip. Just chat, and we’ve got you.
+                    sebelum, saat, dan setelah trip. Just chat, and we've got you.
                 </p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Popular Tours Section -->
+<!-- ==================== POPULAR TOURS SECTION ==================== -->
+{{-- 
+    Section untuk menampilkan tour populer
+    Data diambil dari controller ($popularTours)
+    Jika tidak ada data, tampilkan sample data
+--}}
 <section id="tours" class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {{-- Header section --}}
         <div class="text-center mb-16">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Popular Tours</h2>
             <p class="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -127,40 +164,57 @@
             </p>
         </div>
 
+        {{-- 
+            Conditional rendering:
+            1. Jika ada data $popularTours dari controller
+            2. Jika tidak ada data, tampilkan sample data
+        --}}
         @if(isset($popularTours) && $popularTours->count())
+            {{-- Grid untuk menampilkan tour dari database --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($popularTours as $tour)
                     @php
+                        // Handle image URL: gunakan thumbnail dari database atau gambar default
                         $imageUrl = $tour->thumbnail
-                            ? asset('storage/' . $tour->thumbnail)
+                            ? asset('storage/' . $tour->thumbnail)  // dari storage Laravel
                             : 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=900&q=80';
                     @endphp
+                    {{-- Card untuk setiap tour --}}
                     <div class="card-custom overflow-hidden hover:transform hover:-translate-y-2 transition-all duration-300 group">
                         <div class="relative overflow-hidden">
+                            {{-- Image dengan hover zoom effect --}}
                             <img src="{{ $imageUrl }}"
                                  alt="{{ $tour->name }}"
                                  class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                            {{-- Badge harga --}}
                             <div class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                {{-- Format harga dengan pemisah ribuan --}}
                                 Rp {{ number_format($tour->price, 0, ',', '.') }}
                             </div>
                         </div>
                         <div class="p-6">
+                            {{-- Nama tour --}}
                             <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $tour->name }}</h3>
+                            {{-- Lokasi dengan icon --}}
                             <div class="flex items-center text-gray-600 mb-3">
                                 <i class="fas fa-map-marker-alt mr-2 text-primary"></i>
                                 <span>{{ $tour->location }}</span>
                             </div>
+                            {{-- Durasi dengan icon --}}
                             <div class="flex items-center text-gray-600 mb-4">
                                 <i class="far fa-clock mr-2 text-primary"></i>
                                 <span>{{ $tour->duration_days }} days</span>
                             </div>
 
+                            {{-- Button booking dengan conditional auth --}}
                             @auth
+                                {{-- User sudah login: arahkan ke daftar tour lengkap --}}
                                 <a href="{{ route('tours.index') }}"
                                    class="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-dark transition-all duration-300 flex items-center justify-center">
                                     <i class="fas fa-calendar-plus mr-2"></i>View &amp; Book
                                 </a>
                             @else
+                                {{-- Guest: arahkan ke halaman register --}}
                                 <a href="{{ route('register') }}"
                                    class="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-dark transition-all duration-300 flex items-center justify-center">
                                     <i class="fas fa-sign-in-alt mr-2"></i>Sign Up to Book
@@ -171,7 +225,13 @@
                 @endforeach
             </div>
         @else
+            {{-- 
+                SAMPLE DATA SECTION
+                Ditampilkan jika tidak ada data dari controller
+                Ini berguna untuk development/testing tanpa database
+            --}}
             @php
+                // Array sample tours untuk demo
                 $sampleTours = [
                     [
                         'name' => 'Bali Cultural Experience',
@@ -197,6 +257,7 @@
                 ];
             @endphp
 
+            {{-- Grid untuk sample tours --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($sampleTours as $tour)
                     <div class="card-custom overflow-hidden hover:transform hover:-translate-y-2 transition-all duration-300 group">
@@ -218,6 +279,7 @@
                                 <i class="far fa-clock mr-2 text-primary"></i>
                                 <span>{{ $tour['duration'] }} days</span>
                             </div>
+                            {{-- Button booking (sama seperti di atas) --}}
                             @auth
                                 <a href="{{ route('tours.index') }}"
                                    class="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-dark transition-all duration-300 flex items-center justify-center">
@@ -237,20 +299,26 @@
     </div>
 </section>
 
-<!-- About Section -->
+<!-- ==================== ABOUT SECTION ==================== -->
+{{-- 
+    Section tentang perusahaan
+    Menggunakan grid 2 kolom: teks di kiri, gambar di kanan
+--}}
 <section id="about" class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {{-- Kolom kiri: Teks tentang perusahaan --}}
             <div>
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">About TourBooking</h2>
                 <p class="text-lg text-gray-600 mb-6">
                     TourBooking adalah partner traveling-mu yang fokus bikin perjalanan terasa lebih mudah dan nyaman.  
-                    We curate curated trips that highlight the best of Indonesia’s nature, culture, and local vibes.
+                    We curate curated trips that highlight the best of Indonesia's nature, culture, and local vibes.
                 </p>
                 <p class="text-lg text-gray-600 mb-8">
                     Misi kami: make travel accessible, safe, and memorable for everyone.  
                     Dengan tim berpengalaman dan local experts, setiap trip didesain supaya kamu bisa menikmati pengalaman yang autentik dan berkesan.
                 </p>
+                {{-- List fitur perusahaan --}}
                 <div class="flex flex-wrap gap-4">
                     <div class="flex items-center">
                         <i class="fas fa-check-circle text-primary mr-2"></i>
@@ -266,12 +334,14 @@
                     </div>
                 </div>
             </div>
+            {{-- Kolom kanan: Gambar dengan decorative element --}}
             <div class="relative">
                 <div class="card-custom p-6">
                     <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=900&q=80" 
                          alt="Travel Experience" 
                          class="w-full h-64 object-cover rounded-lg">
                 </div>
+                {{-- Decorative badge --}}
                 <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-primary-light rounded-2xl flex items-center justify-center">
                     <i class="fas fa-award text-primary text-3xl"></i>
                 </div>
@@ -280,9 +350,15 @@
     </div>
 </section>
 
-<!-- Contact Section -->
+<!-- ==================== CONTACT SECTION ==================== -->
+{{-- 
+    Section kontak dengan form
+    Note: Form saat ini disabled (onsubmit="event.preventDefault();")
+    Untuk produksi, hapus onsubmit dan tambahkan action ke route yang sesuai
+--}}
 <section id="contact" class="py-16 bg-gray-50">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {{-- Header --}}
         <div class="text-center mb-10">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
                 Contact <span class="text-primary-dark">Us</span>
@@ -294,7 +370,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Info -->
+            <!-- Kolom kiri: Informasi kontak -->
             <div class="space-y-4 lg:pr-4">
                 <h3 class="text-xl font-semibold text-gray-900 mb-2">Get in touch</h3>
                 <p class="text-gray-600">
@@ -316,23 +392,35 @@
                 </div>
             </div>
 
-            <!-- Form -->
+            <!-- Kolom kanan: Form kontak (2/3 lebar) -->
             <div class="lg:col-span-2">
+                {{-- Notifikasi sukses jika ada --}}
                 @if(session('success'))
                     <div class="mb-4 p-4 rounded-lg bg-green-50 text-green-700 text-sm">
                         {{ session('success') }}
                     </div>
                 @endif
 
-                <form action="{{ route('contact.submit') }}" method="POST" class="card-custom p-6 space-y-4">
+                {{-- 
+                    FORM KONTAK
+                    Catatan: Form saat ini tidak aktif (preventDefault)
+                    Untuk mengaktifkan:
+                    1. Hapus onsubmit="event.preventDefault();"
+                    2. Tambahkan action="{{ route('contact.submit') }}"
+                    3. Tambahkan method="POST"
+                --}}
+                <form action="#" method="POST" onsubmit="event.preventDefault();">
+                    {{-- CSRF Token untuk keamanan --}}
                     @csrf
 
+                    {{-- Grid 2 kolom untuk nama dan email --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
                             <input type="text" name="name" value="{{ old('name') }}"
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark"
                                    placeholder="Your name">
+                            {{-- Error message untuk validasi --}}
                             @error('name')
                                 <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -348,6 +436,7 @@
                         </div>
                     </div>
 
+                    {{-- Field subject --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
                         <input type="text" name="subject" value="{{ old('subject') }}"
@@ -358,6 +447,7 @@
                         @enderror
                     </div>
 
+                    {{-- Field message (textarea) --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
                         <textarea name="message" rows="4"
@@ -368,6 +458,7 @@
                         @enderror
                     </div>
 
+                    {{-- Submit button --}}
                     <div class="flex justify-end">
                         <button type="submit"
                                 class="bg-primary text-white px-6 py-3 rounded-lg font-semibold text-sm md:text-base hover:bg-primary-dark transition-all duration-300 flex items-center gap-2">
@@ -381,7 +472,11 @@
     </div>
 </section>
 
-<!-- CTA Section -->
+<!-- ==================== CTA SECTION ==================== -->
+{{-- 
+    Call-to-Action terakhir
+    Background gelap dengan teks putih
+--}}
 <section class="py-16 bg-gray-900 text-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Adventure?</h2>
@@ -390,6 +485,7 @@
             Sekarang giliran kamu.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {{-- Conditional button berdasarkan auth status --}}
             @guest
                 <a href="{{ route('register') }}"
                    class="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-all duration-300 transform hover:-translate-y-1">
@@ -404,6 +500,7 @@
                 </a>
             @endguest
 
+            {{-- Secondary button --}}
             <a href="#about"
                class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:-translate-y-1">
                 <i class="fas fa-info-circle mr-2"></i>
@@ -413,4 +510,5 @@
     </div>
 </section>
 
+{{-- Akhir section content --}}
 @endsection

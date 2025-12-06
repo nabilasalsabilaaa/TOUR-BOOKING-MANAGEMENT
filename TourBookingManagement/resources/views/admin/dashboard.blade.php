@@ -4,11 +4,17 @@
 
 @section('content')
 @php
+    // Ambil user yang sedang login untuk sapaan di header
     $user = Auth::user();
 @endphp
 
 <div class="container mx-auto px-4 py-8">
-    {{-- HEADER --}}
+    {{-- =======================
+        HEADER DASHBOARD
+        - Judul + badge "Admin Dashboard"
+        - Deskripsi singkat
+        - Tanggal hari ini (now())
+    ======================== --}}
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
@@ -24,6 +30,8 @@
                     Overview of your tour booking system and recent activity.
                 </p>
             </div>
+
+            {{-- Tanggal sekarang (format: Senin, December 6, 2025) --}}
             <div class="flex items-center space-x-2 text-sm text-gray-500">
                 <i class="fas fa-calendar-day text-primary"></i>
                 <span>{{ now()->format('l, F j, Y') }}</span>
@@ -31,9 +39,15 @@
         </div>
     </div>
 
-    {{-- STAT CARDS --}}
+    {{-- =======================
+        STAT CARDS (OVERVIEW)
+        1. Total Tours
+        2. Total Bookings
+        3. Pending Bookings
+        4. Revenue
+    ======================== --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {{-- Total Tours --}}
+        {{-- Total Tours: semua tour baik aktif maupun non-aktif --}}
         <div class="stat-card">
             <div class="flex justify-between items-start">
                 <div>
@@ -52,7 +66,7 @@
             </div>
         </div>
 
-        {{-- Total Bookings --}}
+        {{-- Total Bookings: jumlah semua booking dari pelanggan --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -70,7 +84,7 @@
             </div>
         </div>
 
-        {{-- Pending --}}
+        {{-- Pending: booking yang status-nya masih menunggu konfirmasi admin --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -88,7 +102,7 @@
             </div>
         </div>
 
-        {{-- Revenue --}}
+        {{-- Revenue: total pendapatan dari booking yang sudah dikonfirmasi --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -109,10 +123,19 @@
         </div>
     </div>
 
+    {{-- =======================
+        GRID UTAMA
+        - Left: Recent Bookings
+        - Right: Quick Actions + Tips
+    ======================== --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {{-- RECENT BOOKINGS (Admin view) --}}
+        {{-- =======================
+            RECENT BOOKINGS (Admin view)
+            Menampilkan beberapa booking terakhir
+        ======================== --}}
         <div class="lg:col-span-2">
             <div class="card-custom">
+                {{-- Header card bookings --}}
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <h2 class="text-xl font-bold text-[#010d4c]">Recent Bookings</h2>
                     <a href="{{ route('admin.bookings.index') }}"
@@ -121,19 +144,30 @@
                         <i class="fas fa-arrow-right ml-1 text-xs"></i>
                     </a>
                 </div>
+
+                {{-- Tabel daftar booking terbaru --}}
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tour</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Customer
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Tour
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Date
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Status
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($recentBookings as $booking)
                                 <tr class="hover:bg-gray-50 transition-colors">
+                                    {{-- Nama & kontak customer --}}
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">
                                             {{ $booking->customer_name }}
@@ -142,12 +176,18 @@
                                             {{ $booking->customer_phone }}
                                         </div>
                                     </td>
+
+                                    {{-- Nama tour (via relasi schedule -> tour) --}}
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $booking->schedule->tour->name ?? '-' }}
                                     </td>
+
+                                    {{-- Tanggal jadwal tour (optional untuk handle null schedule/date) --}}
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ optional($booking->schedule->date)->format('M d, Y') ?? '-' }}
                                     </td>
+
+                                    {{-- Status booking dengan badge warna beda: pending/confirmed/cancelled --}}
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="status-badge status-{{ $booking->status }} text-xs">
                                             {{ ucfirst($booking->status) }}
@@ -155,6 +195,7 @@
                                     </td>
                                 </tr>
                             @empty
+                                {{-- Kalau belum ada booking sama sekali --}}
                                 <tr>
                                     <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
                                         No bookings found
@@ -167,8 +208,12 @@
             </div>
         </div>
 
-        {{-- QUICK ACTIONS --}}
+        {{-- =======================
+            QUICK ACTIONS (shortcut admin)
+            + Info card kecil
+        ======================== --}}
         <div class="space-y-6">
+            {{-- Shortcut ke halaman penting (Tours, Schedules, Bookings) --}}
             <div class="card-custom p-6">
                 <div class="flex items-center mb-6">
                     <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-light mr-3">
@@ -200,7 +245,7 @@
                 </div>
             </div>
 
-            {{-- SMALL INFO / HELP CARD --}}
+            {{-- Info / tips kecil untuk admin --}}
             <div class="card-custom p-6 bg-blue-50 border border-blue-100">
                 <div class="flex items-center mb-3">
                     <i class="fas fa-info-circle text-blue-500 text-lg mr-2"></i>
@@ -217,6 +262,7 @@
 
 @push('styles')
 <style>
+    /* Kartu statistik biru di bagian atas */
     .stat-card {
         background: #010d4c;
         border-radius: 12px;
@@ -225,6 +271,7 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
+    /* Badge status booking (pending / confirmed / cancelled) */
     .status-badge {
         padding: 4px 8px;
         border-radius: 12px;
@@ -235,16 +282,19 @@
         width: fit-content;
     }
 
+    /* Warna status: pending (kuning) */
     .status-pending {
         background-color: #fef3c7;
         color: #d97706;
     }
 
+    /* Warna status: confirmed (hijau) */
     .status-confirmed {
         background-color: #d1fae5;
         color: #059669;
     }
 
+    /* Warna status: cancelled (merah) */
     .status-cancelled {
         background-color: #fee2e2;
         color: #dc2626;

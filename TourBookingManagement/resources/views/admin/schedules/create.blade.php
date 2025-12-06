@@ -3,6 +3,11 @@
 @section('title', 'Create Schedule')
 
 @section('content')
+
+{{-- =========================
+     PAGE-SPECIFIC STYLES
+     (Hanya untuk halaman ini)
+   ========================== --}}
 <style>
     :root {
         --tb-primary: #010d4c;
@@ -13,28 +18,30 @@
         --tb-bg-soft: #eef2ff;
     }
 
+    /* Untuk styling row bantuan di bawah (tidak terlalu dipakai di form utama) */
     .tour-option {
         display: flex;
         justify-content: space-between;
         padding: 8px 0;
     }
-    
+
     .tour-name {
         font-weight: 500;
         color: #1f2937;
     }
-    
+
     .tour-price {
         color: var(--tb-accent);
         font-weight: 600;
     }
-    
+
     .tour-details {
         font-size: 0.875rem;
         color: #6b7280;
         margin-top: 2px;
     }
 
+    /* Kartu wrapper form */
     .card-custom {
         background: #ffffff;
         border-radius: 18px;
@@ -42,6 +49,7 @@
         box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
     }
 
+    /* Tombol primary custom (kalau nanti mau dipakai) */
     .btn-primary-custom {
         background: linear-gradient(135deg, var(--tb-primary) 0%, var(--tb-primary-dark) 100%);
         color: #ffffff;
@@ -75,11 +83,13 @@
         background-color: var(--tb-primary-dark);
     }
 
+    /* Checkbox custom agar warnanya mengikuti tema */
     .checkbox-custom:checked {
         background-color: var(--tb-primary);
         border-color: var(--tb-primary);
     }
 
+    /* Spinner loading kecil untuk tombol submit */
     .spinner {
         width: 14px;
         height: 14px;
@@ -98,12 +108,17 @@
 </style>
 
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
+
+    {{-- =========================
+         HEADER SECTION
+       ========================== --}}
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
                 <div class="flex items-center">
-                    <a href="{{ route('admin.schedules.index') }}" class="mr-4 text-gray-500 hover:text-gray-700 transition-colors">
+                    {{-- Back ke index schedule --}}
+                    <a href="{{ route('admin.schedules.index') }}"
+                       class="mr-4 text-gray-500 hover:text-gray-700 transition-colors">
                         <i class="fas fa-arrow-left"></i>
                     </a>
                     <div>
@@ -112,8 +127,11 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Shortcut ke list semua schedule --}}
             <div class="flex space-x-3">
-                <a href="{{ route('admin.schedules.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center transition-all duration-200">
+                <a href="{{ route('admin.schedules.index') }}"
+                   class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center transition-all duration-200">
                     <i class="fas fa-list mr-2"></i>
                     View All Schedules
                 </a>
@@ -122,9 +140,12 @@
     </div>
 
     <div class="max-w-2xl mx-auto">
-        <!-- Form Card -->
+
+        {{-- =========================
+             FORM CARD
+           ========================== --}}
         <div class="card-custom p-8">
-            <!-- Form Header -->
+            {{-- Form header kecil --}}
             <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
                 <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary-light mr-4">
                     <i class="fas fa-calendar-plus text-primary text-xl"></i>
@@ -135,22 +156,30 @@
                 </div>
             </div>
 
+            {{-- Form utama create schedule --}}
             <form action="{{ route('admin.schedules.store') }}" method="POST">
                 @csrf
 
                 <div class="space-y-6">
-                    <!-- Tour Selection -->
+
+                    {{-- =========================
+                         TOUR SELECTION
+                       ========================== --}}
                     <div>
-                        <label for="tour_id" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+                        <label for="tour_id"
+                               class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                             <i class="fas fa-route mr-2 text-primary"></i>
                             Select Tour *
                         </label>
+
+                        {{-- Dropdown pilih tour --}}
                         <div class="relative">
                             <select name="tour_id" id="tour_id" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none">
                                 <option value="">Choose a tour...</option>
                                 @foreach($tours as $tour)
-                                    <option value="{{ $tour->id }}" {{ old('tour_id') == $tour->id ? 'selected' : '' }}
+                                    <option value="{{ $tour->id }}"
+                                            {{ old('tour_id') == $tour->id ? 'selected' : '' }}
                                             data-price="{{ $tour->price }}"
                                             data-duration="{{ $tour->duration_days }}"
                                             data-location="{{ $tour->location }}">
@@ -162,8 +191,8 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                         </div>
-                        
-                        <!-- Tour Details Preview -->
+
+                        {{-- Preview detail tour berdasarkan pilihan --}}
                         <div id="tour-details" class="mt-3 p-4 bg-blue-50 rounded-lg hidden">
                             <div class="grid grid-cols-2 gap-4 text-sm">
                                 <div>
@@ -180,7 +209,8 @@
                                 </div>
                             </div>
                         </div>
-                        
+
+                        {{-- Error tour_id --}}
                         @error('tour_id')
                             <p class="mt-2 text-sm text-error flex items-center">
                                 <i class="fas fa-exclamation-circle mr-2"></i>
@@ -189,16 +219,23 @@
                         @enderror
                     </div>
 
-                    <!-- Date and Slots Row -->
+                    {{-- =========================
+                         DATE & SLOTS
+                       ========================== --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Date -->
+
+                        {{-- Schedule date --}}
                         <div>
-                            <label for="date" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+                            <label for="date"
+                                   class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <i class="far fa-calendar mr-2 text-primary"></i>
                                 Schedule Date *
                             </label>
                             <div class="relative">
-                                <input type="date" name="date" id="date" value="{{ old('date') }}" 
+                                <input type="date"
+                                       name="date"
+                                       id="date"
+                                       value="{{ old('date') }}"
                                        min="{{ date('Y-m-d') }}"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                        required>
@@ -214,14 +251,18 @@
                             @enderror
                         </div>
 
-                        <!-- Available Slots -->
+                        {{-- Available slots --}}
                         <div>
-                            <label for="available_slots" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+                            <label for="available_slots"
+                                   class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <i class="fas fa-users mr-2 text-primary"></i>
                                 Available Slots *
                             </label>
                             <div class="relative">
-                                <input type="number" name="available_slots" id="available_slots" min="1" 
+                                <input type="number"
+                                       name="available_slots"
+                                       id="available_slots"
+                                       min="1"
                                        value="{{ old('available_slots', 10) }}"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                        required>
@@ -238,10 +279,15 @@
                         </div>
                     </div>
 
-                    <!-- Active Status -->
+                    {{-- =========================
+                         ACTIVE STATUS
+                       ========================== --}}
                     <div class="flex items-start pt-4 border-t border-gray-200">
                         <div class="flex items-center h-5">
-                            <input type="checkbox" name="is_active" id="is_active" value="1" 
+                            <input type="checkbox"
+                                   name="is_active"
+                                   id="is_active"
+                                   value="1"
                                    {{ old('is_active', true) ? 'checked' : '' }}
                                    class="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded checkbox-custom">
                         </div>
@@ -262,14 +308,19 @@
                     @enderror
                 </div>
 
-                <!-- Submit Buttons -->
+                {{-- =========================
+                     FORM ACTION BUTTONS
+                   ========================== --}}
                 <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
-                    <a href="{{ route('admin.schedules.index') }}" 
+                    {{-- Cancel kembali ke index --}}
+                    <a href="{{ route('admin.schedules.index') }}"
                        class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center transition-all duration-200">
                         <i class="fas fa-times mr-2"></i>
                         Cancel
                     </a>
-                    <button type="submit" 
+
+                    {{-- Submit create schedule --}}
+                    <button type="submit"
                             class="px-6 py-3 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark focus:ring-2 focus:ring-primary focus:ring-offset-2 flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg">
                         <i class="fas fa-plus mr-2"></i>
                         Create Schedule
@@ -278,14 +329,18 @@
             </form>
         </div>
 
-        <!-- Help Information -->
+        {{-- =========================
+             HELP INFORMATION BOXES
+           ========================== --}}
         <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                 <div class="flex items-start">
                     <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
                     <div>
                         <h4 class="text-sm font-medium text-blue-800">Tour Selection</h4>
-                        <p class="text-xs text-blue-600 mt-1">Choose from available tours. The price and details will be shown automatically.</p>
+                        <p class="text-xs text-blue-600 mt-1">
+                            Choose from available tours. The price and details will be shown automatically.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -294,7 +349,9 @@
                     <i class="fas fa-calendar-check text-green-500 mt-1 mr-3"></i>
                     <div>
                         <h4 class="text-sm font-medium text-green-800">Date Selection</h4>
-                        <p class="text-xs text-green-600 mt-1">Select a future date for the tour. Past dates are not allowed.</p>
+                        <p class="text-xs text-green-600 mt-1">
+                            Select a future date for the tour. Past dates are not allowed.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -303,7 +360,9 @@
                     <i class="fas fa-users text-purple-500 mt-1 mr-3"></i>
                     <div>
                         <h4 class="text-sm font-medium text-purple-800">Available Slots</h4>
-                        <p class="text-xs text-purple-600 mt-1">Set the maximum number of guests for this schedule.</p>
+                        <p class="text-xs text-purple-600 mt-1">
+                            Set the maximum number of guests for this schedule.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -312,76 +371,81 @@
 </div>
 @endsection
 
+{{-- =========================
+     PAGE-SPECIFIC SCRIPTS
+     (Ditaruh di bawah)
+   ========================== --}}
 @push('scripts')
 <script>
-    // Set minimum date to today
+    // Set minimum date ke hari ini (prevent pilih tanggal lampau)
     document.getElementById('date').min = new Date().toISOString().split('T')[0];
-    
-    // Tour details preview
-    const tourSelect = document.getElementById('tour_id');
-    const tourDetails = document.getElementById('tour-details');
-    const tourPrice = document.getElementById('tour-price');
-    const tourDuration = document.getElementById('tour-duration');
-    const tourLocation = document.getElementById('tour-location');
-    
+
+    // Elemen untuk preview detail tour
+    const tourSelect    = document.getElementById('tour_id');
+    const tourDetails   = document.getElementById('tour-details');
+    const tourPrice     = document.getElementById('tour-price');
+    const tourDuration  = document.getElementById('tour-duration');
+    const tourLocation  = document.getElementById('tour-location');
+
+    // Saat dropdown tour berubah, update preview detailnya
     tourSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
-        
+
         if (selectedOption.value) {
-            const price = selectedOption.getAttribute('data-price');
+            const price    = selectedOption.getAttribute('data-price');
             const duration = selectedOption.getAttribute('data-duration');
             const location = selectedOption.getAttribute('data-location');
-            
+
             if (price) {
                 tourPrice.textContent = 'Rp ' + Number(price).toLocaleString('id-ID');
             }
-            
+
             if (duration) {
                 tourDuration.textContent = duration + ' days';
             }
-            
+
             if (location) {
                 tourLocation.textContent = location;
             }
-            
+
             tourDetails.classList.remove('hidden');
         } else {
             tourDetails.classList.add('hidden');
         }
     });
-    
-    // Trigger change event on page load if there's a selected tour
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Kalau ada old value tour, langsung tampilkan preview saat page load
         if (tourSelect.value) {
             tourSelect.dispatchEvent(new Event('change'));
         }
-        
-        // Add form submission loading state
-        const form = document.querySelector('form');
-        const submitButton = form.querySelector('button[type="submit"]');
-        
-        form.addEventListener('submit', function(e) {
+
+        // Tambahkan state "loading" saat form disubmit (hindari double submit)
+        const form          = document.querySelector('form');
+        const submitButton  = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', function() {
             if (!form.classList.contains('prevent-multiple-submit')) {
                 form.classList.add('prevent-multiple-submit');
                 submitButton.disabled = true;
                 submitButton.innerHTML = '<div class="spinner mr-2"></div> Creating...';
             }
         });
-        
-        // Validate date on input
+
+        // Validasi manual tanggal (fallback selain attribute min)
         const dateInput = document.getElementById('date');
         dateInput.addEventListener('change', function() {
             const selectedDate = new Date(this.value);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
+
             if (selectedDate < today) {
                 alert('Please select a future date.');
                 this.value = '';
             }
         });
-        
-        // Validate slots input
+
+        // Validasi slots: tidak boleh kurang dari 1
         const slotsInput = document.getElementById('available_slots');
         slotsInput.addEventListener('input', function() {
             if (this.value < 1) {

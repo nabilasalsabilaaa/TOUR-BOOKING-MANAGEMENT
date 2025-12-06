@@ -6,22 +6,27 @@
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
 
-        {{-- HEADER --}}
+        {{-- =========================
+             HEADER HALAMAN DETAIL BOOKING
+             ========================== --}}
         <div class="mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <div class="flex items-center">
+                        {{-- Tombol kembali ke daftar booking customer --}}
                         <a href="{{ route('customer.bookings.index') }}"
                            class="mr-4 text-gray-500 hover:text-gray-700 transition-colors">
                             <i class="fas fa-arrow-left"></i>
                         </a>
                         <div>
+                            {{-- Judul halaman + nomor booking sebagai referensi --}}
                             <h1 class="text-3xl font-bold text-[#010d4c]">Detail Booking</h1>
                             <p class="text-gray-600 mt-1">Booking #{{ $booking->id }}</p>
                         </div>
                     </div>
                 </div>
 
+                {{-- Aksi cepat di header: kembali & batalkan booking (jika masih pending) --}}
                 <div class="flex flex-wrap gap-3">
                     <a href="{{ route('customer.bookings.index') }}"
                        class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center text-sm shadow-sm">
@@ -29,6 +34,7 @@
                         Kembali ke Daftar Booking
                     </a>
 
+                    {{-- Tombol cancel hanya muncul ketika status booking masih pending --}}
                     @if($booking->status === 'pending')
                         <form action="{{ route('customer.bookings.cancel', $booking) }}" method="POST" class="inline">
                             @csrf
@@ -45,13 +51,17 @@
             </div>
         </div>
 
-        {{-- STATUS BANNER --}}
+        {{-- =========================
+             STATUS BANNER DI ATAS KONTEN
+             Warna & icon menyesuaikan status booking
+             ========================== --}}
         <div class="card-custom p-6 mb-8 border-l-4
             @if($booking->status === 'confirmed') border-green-500 bg-green-50
             @elseif($booking->status === 'cancelled') border-red-500 bg-red-50
             @else border-yellow-400 bg-yellow-50 @endif">
             <div class="flex items-start gap-4">
                 <div class="mt-1">
+                    {{-- Icon besar sesuai status --}}
                     @if($booking->status === 'confirmed')
                         <i class="fas fa-check-circle text-green-500 text-2xl"></i>
                     @elseif($booking->status === 'cancelled')
@@ -61,6 +71,7 @@
                     @endif
                 </div>
                 <div>
+                    {{-- Judul status dinamis berdasarkan status booking --}}
                     <h3 class="text-lg font-semibold
                         @if($booking->status === 'confirmed') text-green-800
                         @elseif($booking->status === 'cancelled') text-red-800
@@ -73,6 +84,8 @@
                             Booking Dibatalkan
                         @endif
                     </h3>
+
+                    {{-- Deskripsi penjelasan kondisi status booking --}}
                     <p class="mt-1 text-sm
                         @if($booking->status === 'confirmed') text-green-700
                         @elseif($booking->status === 'cancelled') text-red-700
@@ -89,12 +102,18 @@
             </div>
         </div>
 
+        {{-- =========================
+             GRID KONTEN UTAMA (LEFT & RIGHT COLUMN)
+             ========================== --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {{-- LEFT COLUMN --}}
+            {{-- =========================
+                 LEFT COLUMN: Informasi Tour + Kontak
+                 ========================== --}}
             <div class="lg:col-span-2 space-y-6">
 
                 {{-- INFORMASI TOUR --}}
                 <div class="card-custom p-6">
+                    {{-- Header kecil section "Informasi Tour" --}}
                     <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-[#eef2ff] mr-4">
                             <i class="fas fa-map-marked-alt text-[#4556a6] text-lg"></i>
@@ -106,18 +125,19 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row gap-6">
-                        {{-- Thumbnail --}}
+                        {{-- Thumbnail tour jika tersedia --}}
                         @if($booking->schedule->tour->thumbnail)
                             <img src="{{ asset('storage/' . $booking->schedule->tour->thumbnail) }}"
                                  alt="{{ $booking->schedule->tour->name }}"
                                  class="w-full md:w-32 h-32 object-cover rounded-lg shadow-sm flex-shrink-0">
                         @else
+                            {{-- Placeholder jika belum ada thumbnail --}}
                             <div class="w-full md:w-32 h-32 rounded-lg bg-[#eef2ff] flex items-center justify-center flex-shrink-0">
                                 <i class="fas fa-map-marked-alt text-[#4556a6] text-2xl"></i>
                             </div>
                         @endif
 
-                        {{-- Info Grid --}}
+                        {{-- Grid info detail tour (nama, lokasi, tanggal, dll) --}}
                         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="text-sm font-medium text-gray-600">Nama Tour</label>
@@ -166,6 +186,7 @@
                         </div>
                     </div>
 
+                    {{-- Deskripsi tour hanya tampil kalau kolom description terisi --}}
                     @if($booking->schedule->tour->description)
                         <div class="mt-6 pt-4 border-t border-gray-200">
                             <label class="text-sm font-medium text-gray-600">Deskripsi Tour</label>
@@ -176,18 +197,22 @@
                     @endif
                 </div>
 
-                {{-- INFORMASI KONTAK --}}
+                {{-- INFORMASI KONTAK PEMESAN --}}
                 <div class="card-custom p-6">
+                    {{-- Header section kontak --}}
                     <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-[#eef2ff] mr-4">
                             <i class="fas fa-user-circle text-[#4556a6] text-lg"></i>
                         </div>
+                   
+
                         <div>
                             <h2 class="text-xl font-bold text-[#010d4c]">Informasi Kontak</h2>
                             <p class="text-gray-600 text-sm">Data pemesan</p>
                         </div>
                     </div>
 
+                    {{-- Grid informasi customer (nama, telp, email, status akun) --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="text-sm font-medium text-gray-600">Nama Lengkap</label>
@@ -207,6 +232,7 @@
                         <div>
                             <label class="text-sm font-medium text-gray-600">Status Akun</label>
                             <p class="mt-1 text-sm text-gray-900">
+                                {{-- Indikator apakah email user sudah diverifikasi --}}
                                 @if($booking->user->email_verified_at)
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                         <i class="fas fa-check-circle mr-1"></i> Terverifikasi
@@ -222,11 +248,14 @@
                 </div>
             </div>
 
-            {{-- RIGHT COLUMN --}}
+            {{-- =========================
+                 RIGHT COLUMN: Detail booking, harga, catatan, bantuan
+                 ========================== --}}
             <div class="space-y-6">
 
-                {{-- DETAIL BOOKING --}}
+                {{-- DETAIL BOOKING (status, tanggal booking, peserta, total) --}}
                 <div class="card-custom p-6">
+                    {{-- Header section detail booking --}}
                     <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-[#eef2ff] mr-4">
                             <i class="fas fa-receipt text-[#4556a6] text-lg"></i>
@@ -238,6 +267,7 @@
                     </div>
 
                     <div class="space-y-4">
+                        {{-- Status booking dengan badge (warna diatur di CSS bawah) --}}
                         <div>
                             <label class="text-sm font-medium text-gray-600">Status Booking</label>
                             <div class="mt-2">
@@ -253,6 +283,7 @@
                             </div>
                         </div>
 
+                        {{-- Informasi kapan booking dibuat --}}
                         <div>
                             <label class="text-sm font-medium text-gray-600">Tanggal Booking</label>
                             <p class="mt-1 text-sm text-gray-900 flex items-center">
@@ -261,6 +292,7 @@
                             </p>
                         </div>
 
+                        {{-- Jumlah peserta yang terdaftar di booking --}}
                         <div>
                             <label class="text-sm font-medium text-gray-600">Jumlah Peserta</label>
                             <p class="mt-1 text-sm text-gray-900 flex items-center">
@@ -269,6 +301,7 @@
                             </p>
                         </div>
 
+                        {{-- Total harga (sudah termasuk semua tamu & fee) --}}
                         <div>
                             <label class="text-sm font-medium text-gray-600">Total Harga</label>
                             <p class="mt-1 text-2xl font-bold text-[#4556a6]">
@@ -278,11 +311,12 @@
                     </div>
                 </div>
 
-                {{-- RINCIAN HARGA --}}
+                {{-- RINCIAN HARGA (breakdown per orang + biaya layanan) --}}
                 <div class="card-custom p-6">
                     <h3 class="text-lg font-semibold text-[#010d4c] mb-4">Rincian Harga</h3>
                     <div class="space-y-3 text-sm text-gray-700">
                         <div class="flex justify-between">
+                            {{-- Perhitungan: jumlah tamu × harga per orang --}}
                             <span>{{ $booking->guests }} orang × Rp {{ number_format($booking->schedule->tour->price, 0, ',', '.') }}</span>
                             <span>Rp {{ number_format($booking->guests * $booking->schedule->tour->price, 0, ',', '.') }}</span>
                         </div>
@@ -299,7 +333,7 @@
                     </div>
                 </div>
 
-                {{-- CATATAN KHUSUS --}}
+                {{-- CATATAN KHUSUS (jika user mengisi notes saat booking) --}}
                 @if($booking->notes)
                     <div class="card-custom p-6 bg-[#eef2ff] border border-[#d7ddff]">
                         <div class="flex items-start">
@@ -312,7 +346,7 @@
                     </div>
                 @endif
 
-                {{-- HELP CARD --}}
+                {{-- HELP CARD (kontak bantuan) --}}
                 <div class="card-custom p-6 bg-gray-50 border border-gray-200">
                     <div class="flex items-center mb-3">
                         <i class="fas fa-question-circle text-gray-500 text-lg mr-2"></i>
@@ -334,7 +368,12 @@
             </div>
         </div>
 
-        {{-- UPCOMING INFO --}}
+        {{-- =========================
+             INFO TAMBAHAN UNTUK TOUR YANG AKAN DATANG
+             Hanya tampil jika:
+             - status = confirmed
+             - tanggal tour di masa depan
+             ========================== --}}
         @if($booking->status === 'confirmed' && $booking->schedule->date->isFuture())
             <div class="card-custom p-6 mt-6 border border-green-200 bg-green-50">
                 <div class="flex items-start gap-3">
@@ -357,6 +396,7 @@
 
 @push('styles')
 <style>
+    /* Badge status umum, dipakai di detail booking (kolom kanan) */
     .status-badge {
         padding: 0.5rem 1rem;
         border-radius: 999px;
@@ -368,18 +408,21 @@
         border: 1px solid transparent;
     }
 
+    /* Warna & border untuk status pending */
     .status-pending {
         background-color: #fef3c7;
         color: #d97706;
         border-color: #fcd34d;
     }
 
+    /* Warna & border untuk status confirmed */
     .status-confirmed {
         background-color: #d1fae5;
         color: #059669;
         border-color: #34d399;
     }
 
+    /* Warna & border untuk status cancelled */
     .status-cancelled {
         background-color: #fee2e2;
         color: #dc2626;

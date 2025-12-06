@@ -4,7 +4,9 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
+    {{-- =========================
+         HEADER SECTION
+       ========================== --}}
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
@@ -13,7 +15,7 @@
                     Create and manage tour schedules efficiently
                 </p>
 
-                {{-- Info kalau sedang filter per tour --}}
+                {{-- Info tambahan jika sedang filter berdasarkan tour tertentu --}}
                 @if(!empty($tourId))
                     @php
                         $currentTour = $tours->firstWhere('id', $tourId);
@@ -30,6 +32,8 @@
                     @endif
                 @endif
             </div>
+
+            {{-- Tombol untuk membuat jadwal baru --}}
             <div class="flex space-x-3">
                 <a href="{{ route('admin.schedules.create') }}" 
                    class="btn-primary-custom px-4 py-2 text-white rounded-lg hover:shadow-lg flex items-center transition">
@@ -40,7 +44,10 @@
         </div>
     </div>
 
-    <!-- Statistics Cards -->
+    {{-- =========================
+         STATISTICS CARDS
+         (Ringkasan jadwal secara global)
+       ========================== --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {{-- Total Schedules --}}
         <div class="stat-card">
@@ -61,7 +68,7 @@
             </div>
         </div>
         
-        {{-- Active Schedules --}}
+        {{-- Active Schedules (jadwal yang masih aktif & ditampilkan ke user) --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -79,7 +86,7 @@
             </div>
         </div>
         
-        {{-- Upcoming --}}
+        {{-- Upcoming (jadwal dengan tanggal >= hari ini) --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -97,7 +104,7 @@
             </div>
         </div>
         
-        {{-- Full Bookings --}}
+        {{-- Full Bookings (jadwal yang slotnya sudah habis) --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -116,24 +123,40 @@
         </div>
     </div>
 
-    <!-- Schedules Table -->
+    {{-- =========================
+         SCHEDULES TABLE
+       ========================== --}}
     <div class="card-custom">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tour Details</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bookings</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tour Details
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date & Time
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Capacity
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Bookings
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($schedules as $schedule)
                     <tr class="table-row-hover">
-                        {{-- Tour details --}}
+                        {{-- =========================
+                             Kolom: Tour details
+                           ========================== --}}
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10 bg-primary-light rounded-lg flex items-center justify-center">
@@ -155,7 +178,9 @@
                             </div>
                         </td>
 
-                        {{-- Date & Time --}}
+                        {{-- =========================
+                             Kolom: Date & Time
+                           ========================== --}}
                         <td class="px-6 py-4">
                             <div class="text-sm font-medium text-gray-900">
                                 {{ $schedule->date->format('M d, Y') }}
@@ -171,15 +196,21 @@
                             @endif
                         </td>
 
-                        {{-- Capacity --}}
+                        {{-- =========================
+                             Kolom: Capacity (progress bar & angka)
+                           ========================== --}}
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
+                                // Hitung total slot:
+                                // - Jika tour punya kapasitas global, pakai itu
+                                // - Jika tidak, estimasi dari slot tersisa + jumlah booking
                                 $totalSlots = $schedule->tour->capacity ?? ($schedule->available_slots + $schedule->bookings_count);
                                 $totalSlots = max($totalSlots, 0);
                                 $booked = $schedule->bookings_count;
                                 $bookedPercentage = $totalSlots > 0 ? ($booked / $totalSlots) * 100 : 0;
                             @endphp
                             <div class="flex items-center">
+                                {{-- Progress bar persen terisi --}}
                                 <div class="w-16 bg-gray-200 rounded-full h-2 mr-3 overflow-hidden">
                                     <div class="bg-primary h-2 rounded-full" style="width: {{ $bookedPercentage }}%"></div>
                                 </div>
@@ -195,7 +226,9 @@
                             </div>
                         </td>
 
-                        {{-- Bookings --}}
+                        {{-- =========================
+                             Kolom: Bookings (jumlah & total revenue)
+                           ========================== --}}
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900 flex items-center">
                                 <i class="fas fa-users mr-2 text-primary"></i>
@@ -208,7 +241,9 @@
                             @endif
                         </td>
 
-                        {{-- Status --}}
+                        {{-- =========================
+                             Kolom: Status (active/inactive + label tambahan)
+                           ========================== --}}
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex flex-col space-y-1">
                                 @if($schedule->is_active)
@@ -237,22 +272,26 @@
                             </div>
                         </td>
 
-                        {{-- Actions --}}
+                        {{-- =========================
+                             Kolom: Actions (edit, lihat bookings, delete)
+                           ========================== --}}
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex space-x-3">
+                                {{-- Edit jadwal --}}
                                 <a href="{{ route('admin.schedules.edit', $schedule) }}" 
                                    class="text-primary hover:text-primary-dark transition-colors"
                                    title="Edit Schedule">
                                     <i class="fas fa-edit"></i>
                                 </a>
 
-                                {{-- Lihat bookings untuk jadwal ini --}}
+                                {{-- Lihat daftar bookings milik jadwal ini (filter di halaman bookings) --}}
                                 <a href="{{ route('admin.bookings.index') }}?schedule={{ $schedule->id }}" 
                                    class="text-info hover:text-blue-800 transition-colors"
                                    title="View Bookings">
                                     <i class="fas fa-list"></i>
                                 </a>
 
+                                {{-- Hapus jadwal (perlu hati-hati, bisa konsekuen ke bookings) --}}
                                 <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -267,6 +306,9 @@
                         </td>
                     </tr>
                     @empty
+                    {{-- =========================
+                         State kosong: belum ada schedule
+                       ========================== --}}
                     <tr>
                         <td colspan="6" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
@@ -286,7 +328,9 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        {{-- =========================
+             PAGINATION
+           ========================== --}}
         @if($schedules->hasPages())
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
             <div class="text-sm text-gray-700">
@@ -301,6 +345,10 @@
 </div>
 @endsection
 
+{{-- =========================
+     PAGE-SPECIFIC STYLES
+     (Dipush ke stack "styles")
+   ========================== --}}
 @push('styles')
 <style>
     :root {
@@ -312,6 +360,7 @@
         --tb-bg-soft: #eef2ff;
     }
 
+    /* Kartu statistik biru di bagian atas */
     .stat-card {
         background: #010d4c;
         border-radius: 12px;
@@ -320,6 +369,7 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
+    /* Badge status di kolom status */
     .badge {
         padding: 4px 8px;
         border-radius: 12px;
@@ -352,6 +402,7 @@
         color: #374151;
     }
 
+    /* Card wrapper utama */
     .card-custom {
         background: #ffffff;
         border-radius: 18px;
@@ -359,11 +410,13 @@
         box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
     }
 
+    /* Tombol primary gradasi */
     .btn-primary-custom {
         background: linear-gradient(135deg, var(--tb-primary) 0%, var(--tb-primary-dark) 100%);
         color: #ffffff;
     }
 
+    /* Hover effect untuk row tabel */
     .table-row-hover {
         transition: all 0.2s ease;
     }
@@ -392,15 +445,21 @@
 </style>
 @endpush
 
+{{-- =========================
+     PAGE-SPECIFIC SCRIPTS
+     (Animasi kecil progress bar)
+   ========================== --}}
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Ambil semua progress bar (div .bg-primary di capacity)
         const progressBars = document.querySelectorAll('.bg-primary');
+
         progressBars.forEach(bar => {
-            const width = bar.style.width;
+            const width = bar.style.width; // width awal (persentase booking)
             bar.style.transition = 'width 0.5s ease-in-out';
             setTimeout(() => {
-                bar.style.width = width;
+                bar.style.width = width; // trigger animasi lebar
             }, 100);
         });
     });

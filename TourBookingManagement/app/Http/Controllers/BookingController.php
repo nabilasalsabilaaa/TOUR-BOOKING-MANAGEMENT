@@ -11,17 +11,30 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
+/**
+ * BookingController
+ *
+ * Mengelola alur booking dari sisi customer.
+ */
 class BookingController extends Controller
 {
+    /**
+     * Service untuk kirim pesan WhatsApp.
+     *
+     * @var WhatsAppService
+     */
     protected WhatsAppService $whatsapp;
 
+    /**
+     * Injeksi WhatsAppService ke controller.
+     */
     public function __construct(WhatsAppService $whatsapp)
     {
         $this->whatsapp = $whatsapp;
     }
 
     /**
-     * Dashboard pelanggan
+     * Dashboard pelanggan.
      */
     public function customerDashboard()
     {
@@ -43,7 +56,6 @@ class BookingController extends Controller
             ->take(5)
             ->get();
 
-        // ✅ Diperbaiki: pakai join ke tour_schedules dan orderBy kolom yang benar
         $today = now()->toDateString();
 
         $upcomingBookings = Booking::with(['schedule.tour'])
@@ -52,13 +64,13 @@ class BookingController extends Controller
             ->whereIn('bookings.status', ['pending', 'confirmed'])
             ->whereDate('tour_schedules.date', '>=', $today)
             ->orderBy('tour_schedules.date', 'asc')
-            ->select('bookings.*') // penting: biar hasilnya tetap instance Booking
+            ->select('bookings.*')
             ->take(5)
             ->get();
 
-            $totalSpent = Booking::where('user_id', $user->id)
-        ->where('status', 'confirmed')
-        ->sum('total_price');
+        $totalSpent = Booking::where('user_id', $user->id)
+            ->where('status', 'confirmed')
+            ->sum('total_price');
 
         return view('customer.dashboard', compact(
             'totalBookings',
@@ -66,63 +78,62 @@ class BookingController extends Controller
             'pendingBookings',
             'recentBookings',
             'totalSpent',
-            'upcomingBookings',
+            'upcomingBookings'
         ));
     }
-public function cancel(Booking $booking)
-{
-    // Pastikan booking ini milik user yang login
-    if ($booking->user_id !== Auth::id()) {
-        abort(403, 'Unauthorized action.');
-    }
-
-    // Hanya boleh batalkan yang masih pending
-    if ($booking->status !== 'pending') {
-        return back()->with('error', 'Hanya booking dengan status pending yang bisa dibatalkan.');
-    }
-
-    DB::transaction(function () use ($booking) {
-        // Kembalikan slot ke jadwal
-        $schedule = $booking->schedule;
-
-        if ($schedule) {
-            // Sesuaikan dengan nama kolom di tabel jadwalmu:
-            // available_slots / available_seats / kapasitas_tersisa, dll.
-            $schedule->increment('available_slots', $booking->guests);
-        }
-
-        // Update status booking
-        $booking->update([
-            'status' => 'cancelled',
-        ]);
-    });
-
-    // (Opsional) kirim WA ke customer
-    if (isset($this->whatsapp)) {
-        $to = $booking->customer_phone;
-
-        if ($to) {
-            $msg =
-                "*Booking DIBATALKAN oleh Anda ❌*\n\n" .
-                "Halo {$booking->customer_name},\n" .
-                "Booking Anda telah dibatalkan.\n\n" .
-                "Detail:\n" .
-                "- Tour: {$booking->schedule->tour->name}\n" .
-                "- Tanggal: {$booking->schedule->date}\n" .
-                "- Peserta: {$booking->guests}\n\n" .
-                "Terima kasih.";
-
-            $this->whatsapp->sendMessage($to, $msg);
-        }
-    }
-
-    return redirect()
-        ->route('customer.bookings.index')
-        ->with('success', 'Booking berhasil dibatalkan dan slot dikembalikan.');
-}
 
     /**
-     * List booking milik user
+     * Membatalkan booking oleh customer.
+     */
+    public function cancel(Booking $booking)
+    {
+        // Pastikan booking ini milik user yang login
+        if ($booking->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Hanya booking dengan status pending yang bisa dibatalkan
+        if ($booking->status !== 'pending') {
+            return back()->with('error', 'Hanya booking dengan status pending yang bisa dibatalkan.');
+        }
+
+        DB::transaction(function () use ($booking) {
+            $schedule = $booking->schedule;
+
+            if ($schedule) {
+                $schedule->increment('available_slots', $booking->guests);
+            }
+
+            $booking->update([
+                'status' => 'cancelled',
+            ]);
+        });
+
+        // (Opsional) kirim WA ke customer
+        if (isset($this->whatsapp)) {
+            $to = $booking->customer_phone;
+
+            if ($to) {
+                $msg =
+                    "*Booking DIBATALKAN oleh Anda ❌*\n\n" .
+                    "Detail:\n" .
+                    "- Tour: {$booking->schedule->tour->name}\n" .
+                    "- Tanggal: {$booking->schedule->date}\n" .
+                    "- Peserta: {$booking->guests}\n\n" .
+                    "Terima kasih.";
+
+                // Service minimal: langsung kirim nomor apa adanya (pastikan di DB sudah 628xxx)
+                $this->whatsapp->sendMessage($to, $msg);
+            }
+        }
+
+        return redirect()
+            ->route('customer.bookings.index')
+            ->with('success', 'Booking berhasil dibatalkan dan slot dikembalikan.');
+    }
+
+    /**
+     * List booking milik user yang login.
      */
     public function index()
     {
@@ -135,7 +146,7 @@ public function cancel(Booking $booking)
     }
 
     /**
-     * Form booking untuk suatu jadwal
+     * Form booking untuk suatu jadwal tertentu.
      */
     public function create(TourSchedule $schedule)
     {
@@ -145,12 +156,10 @@ public function cancel(Booking $booking)
             abort(404, 'Jadwal tidak tersedia.');
         }
 
-        // Cek apakah tanggal jadwal sudah lewat
         if (Carbon::parse($schedule->date)->isPast()) {
             return back()->with('error', 'Tidak dapat booking untuk jadwal yang sudah lewat.');
         }
 
-        // Cek ketersediaan slot
         if ($schedule->available_slots <= 0) {
             return back()->with('error', 'Maaf, slot untuk jadwal ini sudah penuh.');
         }
@@ -159,7 +168,7 @@ public function cancel(Booking $booking)
     }
 
     /**
-     * Simpan booking + kirim WA ke customer & admin
+     * Simpan booking baru + kirim WA ke customer & admin.
      */
     public function store(Request $request, TourSchedule $schedule)
     {
@@ -170,14 +179,12 @@ public function cancel(Booking $booking)
             'notes'  => 'nullable|string|max:500',
         ]);
 
-        // Validasi tambahan — jadwal lampau
         if (Carbon::parse($schedule->date)->isPast()) {
             return back()
                 ->withErrors(['guests' => 'Tidak dapat booking untuk jadwal yang sudah lewat.'])
                 ->withInput();
         }
 
-        // Cek slot
         if ($data['guests'] > $schedule->available_slots) {
             return back()
                 ->withErrors(['guests' => 'Slot tersedia tidak mencukupi. Slot tersisa: ' . $schedule->available_slots])
@@ -197,10 +204,8 @@ public function cancel(Booking $booking)
 
         try {
             DB::transaction(function () use ($schedule, $user, $data, $totalPrice, &$booking) {
-                // Kurangi slot
                 $schedule->decrement('available_slots', $data['guests']);
 
-                // Buat booking
                 $booking = Booking::create([
                     'user_id'          => $user->id,
                     'tour_schedule_id' => $schedule->id,
@@ -214,8 +219,10 @@ public function cancel(Booking $booking)
             });
 
             if ($booking) {
-                // WA ke customer
-                $to = $this->whatsapp->normalizePhone($booking->customer_phone);
+                // ==========================
+                //  WhatsApp ke Customer
+                // ==========================
+                $to = $booking->customer_phone;
 
                 $msgCustomer =
                     "*Booking Berhasil Dibuat 📝*\n\n" .
@@ -232,7 +239,9 @@ public function cancel(Booking $booking)
 
                 $this->whatsapp->sendMessage($to, $msgCustomer);
 
-                // WA ke admin (jika diset)
+                // ==========================
+                //  WhatsApp ke Admin (jika diset)
+                // ==========================
                 $adminNumber = env('ADMIN_WHATSAPP');
 
                 if ($adminNumber) {
@@ -269,7 +278,7 @@ public function cancel(Booking $booking)
     }
 
     /**
-     * Detail booking milik customer
+     * Menampilkan detail satu booking milik customer.
      */
     public function show(Booking $booking)
     {
@@ -281,6 +290,4 @@ public function cancel(Booking $booking)
 
         return view('customer.bookings.show', compact('booking'));
     }
-
-    
 }

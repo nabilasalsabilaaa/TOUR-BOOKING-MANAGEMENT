@@ -4,11 +4,14 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
+    {{-- =========================
+         HEADER SECTION
+       ========================== --}}
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
                 <div class="flex items-center">
+                    {{-- Tombol kembali ke daftar jadwal --}}
                     <a href="{{ route('admin.schedules.index') }}" class="mr-4 text-gray-500 hover:text-gray-700 transition-colors">
                         <i class="fas fa-arrow-left"></i>
                     </a>
@@ -18,6 +21,8 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Shortcut ke halaman index schedule --}}
             <div class="flex space-x-3">
                 <a href="{{ route('admin.schedules.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center transition">
                     <i class="fas fa-list mr-2"></i>
@@ -28,18 +33,23 @@
     </div>
 
     <div class="max-w-2xl mx-auto">
-        <!-- Current Schedule Status -->
+        {{-- =========================
+             CURRENT SCHEDULE STATUS
+             (Info ringkas status jadwal)
+           ========================== --}}
         <div class="card-custom p-6 mb-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="mb-4 md:mb-0">
                     <h3 class="text-lg font-semibold text-gray-800">Current Schedule Status</h3>
                     <div class="flex items-center mt-2 space-x-4">
+                        {{-- Status aktif / non-aktif jadwal --}}
                         <div class="flex items-center">
                             <span class="text-sm text-gray-600 mr-2">Status:</span>
                             <span class="status-badge {{ $schedule->is_active ? 'status-active' : 'status-inactive' }}">
                                 {{ $schedule->is_active ? 'Active' : 'Inactive' }}
                             </span>
                         </div>
+                        {{-- Info jumlah slot yang sudah ter-booking --}}
                         <div class="flex items-center">
                             <span class="text-sm text-gray-600 mr-2">Booked Slots:</span>
                             <span class="font-medium text-gray-900">
@@ -48,6 +58,8 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Badge visibilitas untuk customer --}}
                 <div class="flex space-x-2">
                     @if($schedule->is_active)
                         <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full flex items-center">
@@ -62,9 +74,11 @@
             </div>
         </div>
 
-        <!-- Form Card -->
+        {{-- =========================
+             FORM EDIT SCHEDULE
+           ========================== --}}
         <div class="card-custom p-8">
-            <!-- Form Header -->
+            {{-- Header kecil di dalam card form --}}
             <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
                 <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary-light mr-4">
                     <i class="fas fa-calendar-edit text-primary text-xl"></i>
@@ -75,17 +89,22 @@
                 </div>
             </div>
 
+            {{-- Form utama update jadwal --}}
             <form action="{{ route('admin.schedules.update', $schedule) }}" method="POST" class="prevent-multiple-submit">
                 @csrf
                 @method('PUT')
 
                 <div class="space-y-6">
-                    <!-- Tour Selection -->
+                    {{-- =========================
+                         TOUR SELECTION
+                       ========================== --}}
                     <div>
                         <label for="tour_id" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                             <i class="fas fa-route mr-2 text-primary"></i>
                             Select Tour *
                         </label>
+
+                        {{-- Dropdown pilih paket tour --}}
                         <div class="relative">
                             <select name="tour_id" id="tour_id" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none">
@@ -105,7 +124,7 @@
                             </div>
                         </div>
                         
-                        <!-- Tour Details Preview -->
+                        {{-- Preview detail tour saat ini --}}
                         <div id="tour-details" class="mt-3 p-4 bg-blue-50 rounded-lg">
                             <div class="grid grid-cols-2 gap-4 text-sm">
                                 <div>
@@ -138,6 +157,7 @@
                             </div>
                         </div>
                         
+                        {{-- Error validasi tour --}}
                         @error('tour_id')
                             <p class="mt-2 text-sm text-error flex items-center">
                                 <i class="fas fa-exclamation-circle mr-2"></i>
@@ -146,9 +166,11 @@
                         @enderror
                     </div>
 
-                    <!-- Date and Slots Row -->
+                    {{-- =========================
+                         DATE & AVAILABLE SLOTS
+                       ========================== --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Date -->
+                        {{-- Tanggal jadwal --}}
                         <div>
                             <label for="date" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <i class="far fa-calendar mr-2 text-primary"></i>
@@ -172,7 +194,7 @@
                             @enderror
                         </div>
 
-                        <!-- Available Slots -->
+                        {{-- Slot tersedia --}}
                         <div>
                             <label for="available_slots" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <i class="fas fa-users mr-2 text-primary"></i>
@@ -187,6 +209,7 @@
                                     <i class="fas fa-user-plus"></i>
                                 </div>
                             </div>
+                            {{-- Info jumlah yang sudah dibooking --}}
                             <div class="mt-2 text-xs text-gray-500">
                                 Currently booked: {{ $schedule->bookings_count ?? 0 }} slots
                             </div>
@@ -199,7 +222,9 @@
                         </div>
                     </div>
 
-                    <!-- Active Status -->
+                    {{-- =========================
+                         ACTIVE STATUS TOGGLE
+                       ========================== --}}
                     <div class="flex items-start pt-4 border-t border-gray-200">
                         <div class="flex items-center h-5">
                             <input type="checkbox" name="is_active" id="is_active" value="1" 
@@ -213,7 +238,9 @@
                             <p class="text-sm text-gray-500 mt-1">
                                 When checked, this schedule will be visible to customers for booking.
                                 @if($schedule->bookings_count > 0)
-                                    <span class="text-warning font-medium">Note: There are active bookings for this schedule.</span>
+                                    <span class="text-warning font-medium">
+                                        Note: There are active bookings for this schedule.
+                                    </span>
                                 @endif
                             </p>
                         </div>
@@ -226,13 +253,18 @@
                     @enderror
                 </div>
 
-                <!-- Submit Buttons -->
+                {{-- =========================
+                     FORM ACTION BUTTONS
+                   ========================== --}}
                 <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                    {{-- Batal: kembali ke index --}}
                     <a href="{{ route('admin.schedules.index') }}" 
                        class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center transition">
                         <i class="fas fa-times mr-2"></i>
                         Cancel
                     </a>
+
+                    {{-- Submit update --}}
                     <button type="submit" 
                             class="btn-primary-custom px-6 py-3 text-white rounded-lg text-sm font-medium flex items-center justify-center transition shadow-md hover:shadow-lg">
                         <i class="fas fa-save mr-2"></i>
@@ -242,14 +274,18 @@
             </form>
         </div>
 
-        <!-- Help Information -->
+        {{-- =========================
+             HELP INFORMATION BOXES
+           ========================== --}}
         <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                 <div class="flex items-start">
                     <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
                     <div>
                         <h4 class="text-sm font-medium text-blue-800">Tour Selection</h4>
-                        <p class="text-xs text-blue-600 mt-1">Choose from available tours. Changing the tour will affect all future bookings.</p>
+                        <p class="text-xs text-blue-600 mt-1">
+                            Choose from available tours. Changing the tour will affect all future bookings.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -258,7 +294,9 @@
                     <i class="fas fa-calendar-check text-green-500 mt-1 mr-3"></i>
                     <div>
                         <h4 class="text-sm font-medium text-green-800">Date Selection</h4>
-                        <p class="text-xs text-green-600 mt-1">Select a future date for the tour. Past dates are not allowed.</p>
+                        <p class="text-xs text-green-600 mt-1">
+                            Select a future date for the tour. Past dates are not allowed.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -267,61 +305,71 @@
                     <i class="fas fa-users text-purple-500 mt-1 mr-3"></i>
                     <div>
                         <h4 class="text-sm font-medium text-purple-800">Available Slots</h4>
-                        <p class="text-xs text-purple-600 mt-1">Cannot be lower than currently booked slots ({{ $schedule->bookings_count ?? 0 }}).</p>
+                        <p class="text-xs text-purple-600 mt-1">
+                            Cannot be lower than currently booked slots ({{ $schedule->bookings_count ?? 0 }}).
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Danger Zone -->
+        {{-- =========================
+             DANGER ZONE (DELETE SCHEDULE)
+           ========================== --}}
         @if($schedule->bookings_count == 0)
-        <div class="card-custom p-6 mt-6 border border-red-200">
-            <div class="flex items-center mb-4">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-red-50 mr-3">
-                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+            {{-- Hanya bisa delete jika belum ada booking --}}
+            <div class="card-custom p-6 mt-6 border border-red-200">
+                <div class="flex items-center mb-4">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-red-50 mr-3">
+                        <i class="fas fa-exclamation-triangle text-red-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-red-800">Danger Zone</h3>
+                        <p class="text-red-600 text-sm">Irreversible actions</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-red-800">Danger Zone</h3>
-                    <p class="text-red-600 text-sm">Irreversible actions</p>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div class="mb-3 sm:mb-0">
+                        <h4 class="font-medium text-gray-900">Delete this schedule</h4>
+                        <p class="text-sm text-gray-600">Once deleted, this schedule cannot be recovered.</p>
+                    </div>
+                    <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="px-4 py-2 bg-error text-white rounded-lg text-sm font-medium hover:bg-red-600 flex items-center transition"
+                                onclick="return confirm('Are you sure you want to delete this schedule? This action cannot be undone.')">
+                            <i class="fas fa-trash mr-2"></i>
+                            Delete Schedule
+                        </button>
+                    </form>
                 </div>
             </div>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div class="mb-3 sm:mb-0">
-                    <h4 class="font-medium text-gray-900">Delete this schedule</h4>
-                    <p class="text-sm text-gray-600">Once deleted, this schedule cannot be recovered.</p>
-                </div>
-                <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" 
-                            class="px-4 py-2 bg-error text-white rounded-lg text-sm font-medium hover:bg-red-600 flex items-center transition"
-                            onclick="return confirm('Are you sure you want to delete this schedule? This action cannot be undone.')">
-                        <i class="fas fa-trash mr-2"></i>
-                        Delete Schedule
-                    </button>
-                </form>
-            </div>
-        </div>
         @else
-        <div class="card-custom p-6 mt-6 border border-yellow-200">
-            <div class="flex items-center">
-                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-50 mr-3">
-                    <i class="fas fa-info-circle text-yellow-500"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-yellow-800">Schedule Has Bookings</h3>
-                    <p class="text-yellow-700 text-sm">
-                        This schedule has {{ $schedule->bookings_count }} active booking(s). 
-                        It cannot be deleted until all bookings are cancelled or completed.
-                    </p>
+            {{-- Info: schedule tidak bisa dihapus karena sudah ada booking --}}
+            <div class="card-custom p-6 mt-6 border border-yellow-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-50 mr-3">
+                        <i class="fas fa-info-circle text-yellow-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-yellow-800">Schedule Has Bookings</h3>
+                        <p class="text-yellow-700 text-sm">
+                            This schedule has {{ $schedule->bookings_count }} active booking(s). 
+                            It cannot be deleted until all bookings are cancelled or completed.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
         @endif
     </div>
 </div>
 @endsection
 
+{{-- =========================
+     PAGE-SPECIFIC STYLES
+     (Dipush ke stack "styles")
+   ========================== --}}
 @push('styles')
 <style>
     :root {
@@ -333,11 +381,13 @@
         --tb-bg-soft: #eef2ff;
     }
 
+    /* Checkbox tema biru */
     .checkbox-custom:checked {
         background-color: var(--tb-primary);
         border-color: var(--tb-primary);
     }
     
+    /* Badge status jadwal */
     .status-badge {
         padding: 4px 12px;
         border-radius: 20px;
@@ -355,6 +405,7 @@
         color: #d97706;
     }
 
+    /* Kartu wrapper */
     .card-custom {
         background: #ffffff;
         border-radius: 18px;
@@ -362,6 +413,7 @@
         box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
     }
 
+    /* Tombol primary gradasi */
     .btn-primary-custom {
         background: linear-gradient(135deg, var(--tb-primary) 0%, var(--tb-primary-dark) 100%);
         color: #ffffff;
@@ -381,23 +433,27 @@
 </style>
 @endpush
 
+{{-- =========================
+     PAGE-SPECIFIC SCRIPTS
+     (Dipush ke stack "scripts")
+   ========================== --}}
 @push('scripts')
 <script>
-    // Set minimum date to today
+    // Set minimum date ke hari ini (tambahan selain attribute min di input)
     document.getElementById('date').min = new Date().toISOString().split('T')[0];
     
-    // Tour details preview
-    const tourSelect = document.getElementById('tour_id');
-    const tourDetails = document.getElementById('tour-details');
-    const tourPrice = document.getElementById('tour-price');
+    // Elemen preview detail tour
+    const tourSelect   = document.getElementById('tour_id');
+    const tourPrice    = document.getElementById('tour-price');
     const tourDuration = document.getElementById('tour-duration');
     const tourLocation = document.getElementById('tour-location');
     
+    // Saat user mengganti tour, update preview (harga, durasi, lokasi)
     tourSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         
         if (selectedOption.value) {
-            const price = selectedOption.getAttribute('data-price');
+            const price    = selectedOption.getAttribute('data-price');
             const duration = selectedOption.getAttribute('data-duration');
             const location = selectedOption.getAttribute('data-location');
             
@@ -415,12 +471,12 @@
         }
     });
 
-    // Validate available slots
+    // Validasi agar available_slots tidak boleh lebih kecil dari jumlah booking yang sudah ada
     const availableSlotsInput = document.getElementById('available_slots');
     const currentBookings = {{ $schedule->bookings_count ?? 0 }};
     
     availableSlotsInput.addEventListener('change', function() {
-        const newValue = parseInt(this.value);
+        const newValue = parseInt(this.value, 10);
         if (newValue < currentBookings) {
             alert('Available slots cannot be less than current bookings (' + currentBookings + ').');
             this.value = currentBookings;

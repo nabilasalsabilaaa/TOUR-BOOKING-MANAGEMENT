@@ -5,16 +5,20 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
 
-    {{-- HEADER --}}
+    {{-- =========================
+         HEADER HALAMAN "MY BOOKINGS"
+         ========================= --}}
     <div class="mb-10">
         <h1 class="text-3xl font-bold text-[#010d4c]">My Bookings</h1>
         <p class="text-gray-600 mt-1">View and manage all your bookings.</p>
     </div>
 
-    {{-- STATISTICS --}}
+    {{-- =========================
+         STATISTICS RINGKAS (4 CARD)
+         ========================= --}}
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
         
-        {{-- Total Bookings --}}
+        {{-- Total Bookings (jumlah semua booking milik user, pakai pagination total) --}}
         <div class="p-6 rounded-xl shadow bg-[#010d4c] text-white">
             <div class="flex justify-between items-start">
                 <div>
@@ -28,7 +32,7 @@
             <p class="mt-4 text-sm opacity-80">All bookings made on your account.</p>
         </div>
 
-        {{-- Confirmed --}}
+        {{-- Confirmed bookings (filter by status "confirmed" dari collection halaman ini) --}}
         <div class="p-6 rounded-xl shadow bg-white border">
             <div class="flex justify-between items-start">
                 <div>
@@ -44,7 +48,7 @@
             <p class="mt-4 text-sm text-gray-500">Tours that are fully confirmed.</p>
         </div>
 
-        {{-- Pending --}}
+        {{-- Pending bookings --}}
         <div class="p-6 rounded-xl shadow bg-white border">
             <div class="flex justify-between items-start">
                 <div>
@@ -60,7 +64,7 @@
             <p class="mt-4 text-sm text-gray-500">Awaiting approval.</p>
         </div>
 
-        {{-- Total Spent --}}
+        {{-- Total Spent (jumlahkan total_price semua booking di halaman ini / keseluruhan pagination) --}}
         <div class="p-6 rounded-xl shadow bg-white border">
             <div class="flex justify-between items-start">
                 <div>
@@ -77,7 +81,9 @@
         </div>
     </div>
 
-    {{-- BOOKING LIST --}}
+    {{-- =========================
+         LIST BOOKING / KARTU BOOKING
+         ========================= --}}
     @if($bookings->count() > 0)
 
     <div class="space-y-6">
@@ -86,10 +92,12 @@
 
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
 
-                {{-- IMAGE + BASIC INFO --}}
+                {{-- =====================
+                     KIRI: GAMBAR + INFO DASAR BOOKING
+                     ===================== --}}
                 <div class="flex items-start gap-4 flex-1">
 
-                    {{-- Thumbnail --}}
+                    {{-- Thumbnail tour (ambil dari relasi schedule->tour) --}}
                     @if($booking->schedule->tour->thumbnail)
                         <img src="{{ asset('storage/'.$booking->schedule->tour->thumbnail) }}"
                             class="w-20 h-20 rounded-lg object-cover shadow">
@@ -99,12 +107,13 @@
                         </div>
                     @endif
 
-                    {{-- Info --}}
+                    {{-- Info tour + detail booking singkat --}}
                     <div class="flex-1">
                         <h2 class="text-xl font-bold text-[#010d4c]">
                             {{ $booking->schedule->tour->name }}
                         </h2>
 
+                        {{-- Grid info: tanggal, jumlah tamu, total harga --}}
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600 mt-3">
                             <div class="flex items-center">
                                 <i class="fas fa-calendar-day mr-2 text-[#4556a6]"></i>
@@ -124,6 +133,7 @@
                             </div>
                         </div>
 
+                        {{-- Lokasi tour --}}
                         <div class="flex items-center mt-2 text-sm text-gray-500">
                             <i class="fas fa-map-marker-alt mr-2 text-[#4556a6]"></i>
                             {{ $booking->schedule->tour->location }}
@@ -132,10 +142,12 @@
                     </div>
                 </div>
 
-                {{-- STATUS + ACTIONS --}}
+                {{-- =====================
+                     KANAN: STATUS + TOMBOL AKSI
+                     ===================== --}}
                 <div class="flex flex-col items-start lg:items-end gap-3">
 
-                    {{-- Status --}}
+                    {{-- Badge status (pending / confirmed / cancelled) --}}
                     <span class="px-3 py-1 rounded-full text-sm font-medium
                         @if($booking->status === 'pending')
                             bg-yellow-100 text-yellow-700
@@ -154,17 +166,20 @@
                         @endif
                     </span>
 
+                    {{-- Tanggal booking dibuat --}}
                     <div class="text-xs text-gray-500">
                         Booked on {{ $booking->created_at->format('M d, Y') }}
                     </div>
 
-                    {{-- Buttons --}}
+                    {{-- Tombol Detail + Cancel (kalau status masih pending) --}}
                     <div class="flex gap-2">
+                        {{-- Link ke halaman detail booking customer --}}
                         <a href="{{ route('customer.bookings.show', $booking) }}"
                             class="bg-[#010d4c] text-white px-4 py-2 rounded-lg text-sm shadow">
                             <i class="fas fa-eye mr-1"></i>Details
                         </a>
 
+                        {{-- Form cancel booking: PATCH ke route cancel khusus --}}
                         @if($booking->status === 'pending')
                         <form action="{{ route('customer.bookings.cancel', $booking) }}" method="POST">
                             @csrf
@@ -181,7 +196,9 @@
 
             </div>
 
-            {{-- NOTES --}}
+            {{-- =====================
+                 SPECIAL REQUEST / NOTES BOOKING
+                 ===================== --}}
             @if($booking->notes)
             <div class="mt-4 p-4 bg-[#eef2ff] border border-[#d7ddff] rounded-lg">
                 <div class="flex items-start">
@@ -194,7 +211,10 @@
             </div>
             @endif
 
-            {{-- UPCOMING ALERT --}}
+            {{-- =====================
+                 ALERT UNTUK BOOKING YANG AKAN DATANG
+                 (hanya untuk status confirmed + tanggal di masa depan)
+                 ===================== --}}
             @if($booking->status === 'confirmed' && $booking->schedule->date->isFuture())
             <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <div class="flex items-center">
@@ -210,7 +230,9 @@
         @endforeach
     </div>
 
-    {{-- PAGINATION --}}
+    {{-- =========================
+         PAGINATION
+         ========================= --}}
     <div class="mt-8 flex items-center justify-between">
         <div class="text-sm text-gray-600">
             Showing {{ $bookings->firstItem() }} to {{ $bookings->lastItem() }} of {{ $bookings->total() }} bookings
@@ -222,7 +244,9 @@
 
     @else
 
-    {{-- EMPTY STATE --}}
+    {{-- =========================
+         EMPTY STATE (KALAU BELUM ADA BOOKING)
+         ========================= --}}
     <div class="p-12 border bg-white rounded-xl shadow text-center">
         <div class="w-20 h-20 mx-auto bg-[#eef2ff] rounded-full flex items-center justify-center mb-6">
             <i class="fas fa-bookmark text-[#4556a6] text-3xl"></i>
@@ -231,9 +255,11 @@
         <p class="text-gray-600 mb-6">Start exploring our tours and make your first booking!</p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {{-- Arahkan user ke halaman semua tour --}}
             <a href="{{ route('tours.index') }}" class="bg-[#010d4c] text-white px-6 py-3 rounded-lg shadow">
                 <i class="fas fa-search mr-2"></i>Browse Tours
             </a>
+            {{-- Link kembali ke home --}}
             <a href="{{ route('home') }}" class="px-6 py-3 border rounded-lg text-gray-700 hover:bg-gray-100">
                 <i class="fas fa-home mr-2"></i>Back to Home
             </a>

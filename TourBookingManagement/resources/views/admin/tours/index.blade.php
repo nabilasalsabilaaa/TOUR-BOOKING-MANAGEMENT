@@ -4,17 +4,25 @@
 
 @section('content')
 @php
+    // Cek role untuk nentuin tampilan kolom "Actions" vs "Booking"
     $isAdmin = auth()->check() && auth()->user()->role === 'admin';
 @endphp
 
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
+    {{-- =========================
+        HEADER HALAMAN
+        - Judul
+        - Deskripsi singkat
+        - Tombol "Add New Tour"
+    ========================== --}}
     <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
                 <h1 class="text-3xl font-bold text-gray-900">Manage Tours</h1>
                 <p class="text-gray-600 mt-2">Create and manage tour packages</p>
             </div>
+
+            {{-- Tombol untuk buat tour baru --}}
             <div class="flex space-x-3">
                 <a href="{{ route('admin.tours.create') }}" class="btn-primary-custom px-4 py-2 text-white rounded-lg flex items-center transition">
                     <i class="fas fa-plus mr-2"></i>
@@ -24,8 +32,15 @@
         </div>
     </div>
 
-    <!-- Statistics Cards -->
+    {{-- =========================
+        STATISTICS CARDS
+        - Total tours
+        - Active tours
+        - Total revenue
+        - Average price
+    ========================== --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {{-- Total Tours --}}
         <div class="stat-card">
             <div class="flex justify-between items-start">
                 <div>
@@ -44,6 +59,7 @@
             </div>
         </div>
         
+        {{-- Active Tours (is_active = true) --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -61,6 +77,7 @@
             </div>
         </div>
         
+        {{-- Total Revenue dari semua booking tours (butuh eager load aggregate) --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -78,6 +95,7 @@
             </div>
         </div>
         
+        {{-- Rata-rata harga tour --}}
         <div class="card-custom p-6">
             <div class="flex justify-between items-start">
                 <div>
@@ -96,37 +114,60 @@
         </div>
     </div>
 
-
-
-    <!-- Tours Table -->
+    {{-- =========================
+        TABEL DAFTAR TOUR
+    ========================== --}}
     <div class="card-custom">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price & Duration</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statistics</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        {{-- Info lokasi tour --}}
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Location
+                        </th>
 
-@if (!$isAdmin)
-    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking</th>
-@endif
+                        {{-- Harga + durasi tour --}}
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Price & Duration
+                        </th>
 
+                        {{-- Statistik per tour (jumlah booking + revenue per tour) --}}
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Statistics
+                        </th>
+
+                        {{-- Status tour (Active / Inactive) --}}
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+
+                        {{-- Untuk ADMIN: label "Actions", untuk non-admin, nanti ada kolom Booking juga --}}
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+
+                        @if (!$isAdmin)
+                            {{-- Kolom booking khusus jika user bukan admin (mis. customer) --}}
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Booking
+                            </th>
+                        @endif
                     </tr>
                 </thead>
+
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($tours as $tour)
                     <tr class="table-row-hover">
-                       
-
+                        {{-- ========== LOCATION ========== --}}
                         <td class="px-6 py-4">
                             <div class="text-sm text-gray-900 flex items-center">
                                 <i class="fas fa-map-marker-alt mr-2 text-primary text-sm"></i>
                                 {{ $tour->location ?? 'Not specified' }}
                             </div>
                         </td>
+
+                        {{-- ========== PRICE & DURATION ========== --}}
                         <td class="px-6 py-4">
                             <div class="text-sm font-medium text-gray-900">
                                 Rp {{ number_format($tour->price, 0, ',', '.') }}
@@ -141,6 +182,8 @@
                             </div>
                             @endif
                         </td>
+
+                        {{-- ========== STATISTICS PER TOUR ========== --}}
                         <td class="px-6 py-4">
                             <div class="text-sm text-gray-900 flex items-center">
                                 <i class="fas fa-users mr-2 text-primary"></i>
@@ -152,6 +195,8 @@
                             </div>
                             @endif
                         </td>
+
+                        {{-- ========== STATUS BADGE ========== --}}
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($tour->is_active)
                             <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 flex items-center w-fit">
@@ -165,50 +210,64 @@
                             </span>
                             @endif
                         </td>
-                         @if ($isAdmin)
-    {{-- ADMIN: tombol CRUD --}}
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <div class="flex space-x-3">
-            <a href="{{ route('admin.tours.edit', $tour) }}" 
-               class="text-primary hover:text-primary-dark transition-colors"
-               title="Edit Tour">
-                <i class="fas fa-edit"></i>
-            </a>
-            <a href="{{ route('admin.schedules.create') }}?tour={{ $tour->id }}" 
-               class="text-info hover:text-blue-800 transition-colors"
-               title="Add Schedule">
-                <i class="fas fa-calendar-plus"></i>
-            </a>
-            <a href="{{ route('admin.schedules.index') }}?tour={{ $tour->id }}" 
-               class="text-success hover:text-green-800 transition-colors"
-               title="View Schedules">
-                <i class="fas fa-list"></i>
-            </a>
-            <form action="{{ route('admin.tours.destroy', $tour) }}" method="POST" class="inline">
-                @csrf
-                @method('DELETE')
-                <button type="submit" 
-                        class="text-error hover:text-red-800 transition-colors"
-                        onclick="return confirm('Are you sure you want to delete this tour? This will also delete all related schedules and bookings.')"
-                        title="Delete Tour">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </form>
-        </div>
-    </td>
-@else
-    {{-- CUSTOMER: cuma tombol booking / detail --}}
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <a href="{{ route('tours.show', $tour) }}" 
-           class="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition">
-            <i class="fas fa-ticket-alt mr-2 text-[11px]"></i>
-            Book This Tour
-        </a>
-    </td>
-@endif
-                        
+
+                        @if ($isAdmin)
+                            {{-- ========== ADMIN: AKSI CRUD ========== --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-3">
+                                    {{-- Edit detail tour --}}
+                                    <a href="{{ route('admin.tours.edit', $tour) }}" 
+                                       class="text-primary hover:text-primary-dark transition-colors"
+                                       title="Edit Tour">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    {{-- Tambah schedule baru untuk tour ini --}}
+                                    <a href="{{ route('admin.schedules.create') }}?tour={{ $tour->id }}" 
+                                       class="text-info hover:text-blue-800 transition-colors"
+                                       title="Add Schedule">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </a>
+
+                                    {{-- Lihat daftar schedule untuk tour ini --}}
+                                    <a href="{{ route('admin.schedules.index') }}?tour={{ $tour->id }}" 
+                                       class="text-success hover:text-green-800 transition-colors"
+                                       title="View Schedules">
+                                        <i class="fas fa-list"></i>
+                                    </a>
+
+                                    {{-- Hapus tour (beserta schedules & bookings terkait) --}}
+                                    <form action="{{ route('admin.tours.destroy', $tour) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="text-error hover:text-red-800 transition-colors"
+                                                onclick="return confirm('Are you sure you want to delete this tour? This will also delete all related schedules and bookings.')"
+                                                title="Delete Tour">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        @else
+                            {{-- ========== NON-ADMIN (CUSTOMER): TOMBOL BOOKING SAJA ========== --}}
+                            {{-- Kolom "Actions" di header masih ada, tapi kosongan di sini.
+                                Interaksi utama non-admin ada di kolom "Booking" di bawah. --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                {{-- Bisa diisi link "View Detail" kalau mau --}}
+                            </td>
+
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="{{ route('tours.show', $tour) }}" 
+                                   class="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition">
+                                    <i class="fas fa-ticket-alt mr-2 text-[11px]"></i>
+                                    Book This Tour
+                                </a>
+                            </td>
+                        @endif
                     </tr>
                     @empty
+                    {{-- Kalau belum ada tour sama sekali --}}
                     <tr>
                         <td colspan="6" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
@@ -228,7 +287,9 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        {{-- =========================
+            PAGINATION
+        ========================== --}}
         @if($tours->hasPages())
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
             <div class="text-sm text-gray-700">
@@ -254,6 +315,7 @@
         --tb-bg-soft: #eef2ff;
     }
 
+    /* Kartu statistik biru di bagian atas */
     .stat-card {
         background: #010d4c;
         border-radius: 12px;
@@ -262,6 +324,7 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
+    /* Card wrapper putih untuk tabel & info */
     .card-custom {
         background: #ffffff;
         border-radius: 18px;
@@ -269,6 +332,7 @@
         box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
     }
 
+    /* Tombol utama biru gradien */
     .btn-primary-custom {
         background: linear-gradient(135deg, var(--tb-primary) 0%, var(--tb-primary-dark) 100%);
         color: #ffffff;
@@ -280,6 +344,7 @@
         box-shadow: 0 18px 40px rgba(1, 13, 76, 0.35);
     }
 
+    /* Hover effect untuk tiap baris tabel */
     .table-row-hover {
         transition: all 0.18s ease;
     }
@@ -306,14 +371,12 @@
 
 @push('scripts')
 <script>
-    // Simple filter functionality (placeholder, bisa dikembangkan ke AJAX)
+    // Placeholder untuk fitur filter/sort ke depannya
+    // (Saat ini belum ada elemen input/filter di blade ini, jadi hanya skeleton.)
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.querySelector('input[type="text"]');
         const statusFilter = document.querySelectorAll('select')[0];
         const sortFilter = document.querySelectorAll('select')[1];
-
-        // Tambahkan event listener kalau nanti mau dihubungkan ke backend filter.
-        // Untuk sekarang cukup siap dipakai.
     });
 </script>
 @endpush

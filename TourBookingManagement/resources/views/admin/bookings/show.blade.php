@@ -3,6 +3,10 @@
 @section('title', 'Booking Details')
 
 @section('content')
+
+{{-- =========================
+     CUSTOM STYLES (PAGE ONLY)
+   ========================== --}}
 <style>
     :root {
         --tb-primary: #010d4c;
@@ -13,6 +17,7 @@
         --tb-bg-soft: #eef2ff;
     }
 
+    /* Kartu umum untuk section konten */
     .card-custom {
         background: #ffffff;
         border-radius: 18px;
@@ -21,6 +26,7 @@
         padding: 1.5rem;
     }
 
+    /* Item info berbaris (label + value) */
     .info-item {
         display: flex;
         align-items: center;
@@ -32,6 +38,7 @@
         border-bottom: none;
     }
 
+    /* Header section (ikon + judul) */
     .section-header {
         display: flex;
         align-items: center;
@@ -55,6 +62,7 @@
         color: var(--tb-primary-soft);
     }
 
+    /* Timeline gaya vertical */
     .timeline {
         position: relative;
         padding-left: 30px;
@@ -102,6 +110,7 @@
         box-shadow: 0 0 0 3px rgba(69, 86, 166, 0.35);
     }
 
+    /* Badge status di header */
     .status-pill {
         padding: 0.35rem 0.9rem;
         font-size: 0.75rem;
@@ -114,6 +123,7 @@
         gap: 0.4rem;
     }
 
+    /* Tombol utama (Print) */
     .btn-primary-modern {
         border-radius: 999px;
         background: linear-gradient(135deg, var(--tb-primary) 0%, var(--tb-primary-dark) 100%);
@@ -127,6 +137,7 @@
         transform: translateY(-1px);
     }
 
+    /* Tombol accent (Confirm) */
     .btn-accent-modern {
         border-radius: 999px;
         background: linear-gradient(135deg, var(--tb-accent) 0%, var(--tb-accent-soft) 100%);
@@ -139,6 +150,7 @@
         filter: brightness(0.97);
     }
 
+    /* Spinner loading kecil untuk tombol */
     .spinner {
         width: 14px;
         height: 14px;
@@ -157,11 +169,15 @@
 </style>
 
 <div class="container mx-auto px-4 py-8">
-    <!-- Header Section -->
+
+    {{-- =========================
+         HEADER SECTION
+       ========================== --}}
     <div class="mb-8">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
                 <div class="flex items-center">
+                    {{-- Back icon kecil ke index bookings --}}
                     <a href="{{ route('admin.bookings.index') }}"
                        class="mr-4 text-slate-500 hover:text-slate-700 transition-colors">
                         <i class="fas fa-arrow-left"></i>
@@ -179,8 +195,11 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Header actions: confirm/cancel/back/print --}}
             <div class="flex flex-wrap gap-3">
                 @if($booking->status === 'pending')
+                    {{-- Confirm booking (Admin) --}}
                     <form action="{{ route('admin.bookings.confirm', $booking) }}" method="POST">
                         @csrf
                         <button type="submit"
@@ -188,6 +207,8 @@
                             <i class="fas fa-check"></i> Confirm Booking
                         </button>
                     </form>
+
+                    {{-- Cancel booking (Admin) --}}
                     <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST">
                         @csrf
                         <button type="submit"
@@ -197,10 +218,14 @@
                         </button>
                     </form>
                 @endif
+
+                {{-- Back to list --}}
                 <a href="{{ route('admin.bookings.index') }}"
                    class="px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 flex items-center gap-2 transition-all duration-200">
                     <i class="fas fa-arrow-left"></i> Back to List
                 </a>
+
+                {{-- Print current page --}}
                 <button
                     class="btn-primary-modern px-4 py-2 text-sm flex items-center gap-2 transition-all duration-200"
                     onclick="window.print()">
@@ -211,9 +236,12 @@
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <!-- Left Column - Main Information -->
+        {{-- =========================
+             LEFT: MAIN INFO & TOUR
+           ========================== --}}
         <div class="xl:col-span-2 space-y-8">
-            <!-- Booking Timeline -->
+
+            {{-- Booking Timeline --}}
             <div class="card-custom">
                 <div class="section-header">
                     <div class="section-icon section-icon-primary">
@@ -221,7 +249,9 @@
                     </div>
                     <h2 class="text-xl font-bold text-slate-800">Booking Timeline</h2>
                 </div>
+
                 <div class="timeline">
+                    {{-- Booking created --}}
                     <div class="timeline-item completed">
                         <div class="text-sm font-semibold text-slate-900">Booking Created</div>
                         <div class="text-xs text-slate-500 mt-1">
@@ -229,6 +259,7 @@
                         </div>
                     </div>
 
+                    {{-- Booking confirmed / awaiting --}}
                     @if($booking->status === 'confirmed' || $booking->status === 'completed')
                         <div class="timeline-item completed">
                             <div class="text-sm font-semibold text-slate-900">Booking Confirmed</div>
@@ -247,6 +278,7 @@
                         </div>
                     @endif
 
+                    {{-- Completed / upcoming tour --}}
                     @if($booking->status === 'completed')
                         <div class="timeline-item completed">
                             <div class="text-sm font-semibold text-slate-900">Tour Completed</div>
@@ -265,7 +297,7 @@
                 </div>
             </div>
 
-            <!-- Tour Information -->
+            {{-- Tour Information --}}
             <div class="card-custom">
                 <div class="section-header">
                     <div class="section-icon bg-emerald-50 text-emerald-600">
@@ -273,7 +305,9 @@
                     </div>
                     <h2 class="text-xl font-bold text-slate-800">Tour Information</h2>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Tour name --}}
                     <div class="info-item">
                         <div class="w-10 h-10 rounded-xl bg-[var(--tb-bg-soft)] flex items-center justify-center mr-4">
                             <i class="fas fa-route text-[var(--tb-primary-soft)]"></i>
@@ -285,6 +319,8 @@
                             </p>
                         </div>
                     </div>
+
+                    {{-- Location --}}
                     <div class="info-item">
                         <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-4">
                             <i class="fas fa-map-marker-alt text-blue-500"></i>
@@ -296,6 +332,8 @@
                             </p>
                         </div>
                     </div>
+
+                    {{-- Schedule date --}}
                     <div class="info-item">
                         <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mr-4">
                             <i class="far fa-calendar text-amber-500"></i>
@@ -307,6 +345,8 @@
                             </p>
                         </div>
                     </div>
+
+                    {{-- Duration --}}
                     <div class="info-item">
                         <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-4">
                             <i class="far fa-clock text-indigo-500"></i>
@@ -318,6 +358,8 @@
                             </p>
                         </div>
                     </div>
+
+                    {{-- Description --}}
                     <div class="md:col-span-2 info-item">
                         <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center mr-4">
                             <i class="fas fa-info-circle text-slate-500"></i>
@@ -333,9 +375,12 @@
             </div>
         </div>
 
-        <!-- Right Column - Side Information -->
+        {{-- =========================
+             RIGHT: SUMMARY & CUSTOMER
+           ========================== --}}
         <div class="space-y-8">
-            <!-- Booking Summary -->
+
+            {{-- Booking Summary --}}
             <div class="card-custom">
                 <div class="section-header">
                     <div class="section-icon bg-[var(--tb-bg-soft)] text-[var(--tb-primary-soft)]">
@@ -343,6 +388,7 @@
                     </div>
                     <h2 class="text-xl font-bold text-slate-800">Booking Summary</h2>
                 </div>
+
                 <div class="space-y-4 text-sm">
                     <div class="flex justify-between items-center py-1">
                         <span class="text-slate-500">Booking ID</span>
@@ -366,6 +412,8 @@
                             Rp {{ number_format($booking->total_price / $booking->guests, 0, ',', '.') }}
                         </span>
                     </div>
+
+                    {{-- Total amount --}}
                     <div class="border-t border-slate-200 pt-4 mt-2">
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-slate-800">Total Amount</span>
@@ -377,7 +425,7 @@
                 </div>
             </div>
 
-            <!-- Customer Information -->
+            {{-- Customer Information --}}
             <div class="card-custom">
                 <div class="section-header">
                     <div class="section-icon bg-purple-50 text-purple-500">
@@ -385,7 +433,9 @@
                     </div>
                     <h2 class="text-xl font-bold text-slate-800">Customer Information</h2>
                 </div>
+
                 <div class="space-y-4">
+                    {{-- Nama customer --}}
                     <div class="flex items-center py-2">
                         <div class="w-10 h-10 rounded-full bg-[var(--tb-bg-soft)] flex items-center justify-center mr-3">
                             <i class="fas fa-user text-[var(--tb-primary-soft)]"></i>
@@ -395,6 +445,8 @@
                             <p class="text-xs text-slate-500">Customer</p>
                         </div>
                     </div>
+
+                    {{-- Phone --}}
                     <div class="flex items-center py-2">
                         <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mr-3">
                             <i class="fas fa-phone text-blue-500 text-sm"></i>
@@ -403,6 +455,8 @@
                             <p class="font-medium text-slate-900">{{ $booking->customer_phone }}</p>
                         </div>
                     </div>
+
+                    {{-- Email --}}
                     <div class="flex items-center py-2">
                         <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center mr-3">
                             <i class="fas fa-envelope text-emerald-500 text-sm"></i>
@@ -414,7 +468,7 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
+            {{-- Quick Actions (placeholder, bisa dihubungkan ke fitur lain nanti) --}}
             <div class="card-custom">
                 <div class="section-header">
                     <div class="section-icon bg-orange-50 text-orange-500">
@@ -441,7 +495,7 @@
                 </div>
             </div>
 
-            <!-- Customer Notes -->
+            {{-- Customer Notes (opsional) --}}
             @if($booking->notes)
                 <div class="card-custom">
                     <div class="section-header">
@@ -460,13 +514,18 @@
 </div>
 @endsection
 
+{{-- =========================
+     PAGE-SPECIFIC SCRIPTS
+   ========================== --}}
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Tambahkan efek "Processing..." sementara pada tombol quick actions
         const actionButtons = document.querySelectorAll('.card-custom button');
 
         actionButtons.forEach(button => {
             button.addEventListener('click', function () {
+                // Hindari double klik yang berulang-ulang
                 if (this.classList.contains('prevent-multiple-submit')) return;
 
                 const originalText = this.innerHTML;

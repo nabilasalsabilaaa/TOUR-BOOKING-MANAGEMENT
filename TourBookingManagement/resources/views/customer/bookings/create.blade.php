@@ -5,11 +5,14 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
-        <!-- Header Section -->
+        {{-- =========================
+             HEADER HALAMAN BOOKING
+             ========================= --}}
         <div class="mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="mb-4 md:mb-0">
                     <div class="flex items-center">
+                        {{-- Tombol back ke halaman sebelumnya --}}
                         <a href="{{ url()->previous() }}" class="mr-4 text-gray-500 hover:text-gray-700 transition-colors">
                             <i class="fas fa-arrow-left"></i>
                         </a>
@@ -19,6 +22,7 @@
                         </div>
                     </div>
                 </div>
+                {{-- Info kecil di kanan atas --}}
                 <div class="flex items-center space-x-2 text-sm text-gray-500">
                     <i class="fas fa-shield-alt text-primary"></i>
                     <span>Secure Booking • Instant Confirmation</span>
@@ -26,11 +30,16 @@
             </div>
         </div>
 
+        {{-- =========================
+             GRID: FORM (2 kolom) + RINGKASAN TOUR (1 kolom)
+             ========================= --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Booking Form -->
+            {{-- =====================
+                 KOLOM KIRI: BOOKING FORM
+                 ===================== --}}
             <div class="lg:col-span-2">
                 <div class="card-custom p-6">
-                    <!-- Form Header -->
+                    {{-- Header form --}}
                     <div class="flex items-center mb-6 pb-4 border-b border-gray-200">
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-light mr-4">
                             <i class="fas fa-calendar-check text-primary text-lg"></i>
@@ -41,11 +50,14 @@
                         </div>
                     </div>
                     
+                    {{-- FORM BOOKING (POST ke bookings.store dengan schedule terkait) --}}
                     <form action="{{ route('customer.bookings.store', $schedule) }}" method="POST" class="prevent-multiple-submit">
                         @csrf
 
                         <div class="space-y-6">
-                            <!-- Tour Information Summary -->
+                            {{-- ================
+                                 RINGKASAN TOUR DI ATAS FORM
+                                ================ --}}
                             <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                                 <div class="flex items-start justify-between">
                                     <div>
@@ -61,6 +73,7 @@
                                     </div>
                                     <div class="text-right">
                                         <div class="text-lg font-bold text-primary">
+                                            {{-- Harga per orang --}}
                                             Rp {{ number_format($schedule->tour->price, 0, ',', '.') }}
                                         </div>
                                         <div class="text-sm text-gray-500">per person</div>
@@ -68,7 +81,9 @@
                                 </div>
                             </div>
 
-                            <!-- Number of Guests -->
+                            {{-- ================
+                                 JUMLAH TAMU / GUESTS
+                                ================ --}}
                             <div>
                                 <label for="guests" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                     <i class="fas fa-users mr-2 text-primary"></i>
@@ -87,6 +102,7 @@
                                     <p class="text-sm text-gray-500">
                                         Maximum: {{ $schedule->available_slots }} slots available
                                     </p>
+                                    {{-- Pesan error validasi untuk guests --}}
                                     @error('guests')
                                         <p class="text-sm text-error flex items-center">
                                             <i class="fas fa-exclamation-circle mr-2"></i>
@@ -96,7 +112,9 @@
                                 </div>
                             </div>
 
-                            <!-- Notes -->
+                            {{-- ================
+                                 CATATAN / SPECIAL REQUEST
+                                ================ --}}
                             <div>
                                 <label for="notes" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                     <i class="fas fa-sticky-note mr-2 text-primary"></i>
@@ -113,10 +131,13 @@
                                 @enderror
                             </div>
 
-                            <!-- Price Calculation -->
+                            {{-- ================
+                                 RINCIAN HARGA / PRICE SUMMARY
+                                ================ --}}
                             <div class="border-t border-gray-200 pt-6">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Price Summary</h3>
                                 <div class="space-y-2">
+                                    {{-- Subtotal: guests x price per person (di-update via JS) --}}
                                     <div class="flex justify-between text-sm text-gray-600">
                                         <span class="flex items-center">
                                             <i class="fas fa-user mr-2 text-primary"></i>
@@ -124,6 +145,7 @@
                                         </span>
                                         <span id="subtotal">Rp {{ number_format($schedule->tour->price, 0, ',', '.') }}</span>
                                     </div>
+                                    {{-- Service fee (saat ini 0) --}}
                                     <div class="flex justify-between text-sm text-gray-600">
                                         <span class="flex items-center">
                                             <i class="fas fa-receipt mr-2 text-primary"></i>
@@ -131,6 +153,7 @@
                                         </span>
                                         <span>Rp 0</span>
                                     </div>
+                                    {{-- Total keseluruhan --}}
                                     <div class="border-t pt-2 mt-2">
                                         <div class="flex justify-between items-center font-semibold text-lg text-gray-900">
                                             <span>Total Amount</span>
@@ -142,19 +165,25 @@
                                 </div>
                             </div>
 
-                            <!-- Terms and Conditions -->
+                            {{-- ================
+                                 INFORMASI / TERMS
+                                ================ --}}
                             <div class="bg-yellow-50 border border-yellow-100 rounded-lg p-4">
                                 <div class="flex items-start">
                                     <i class="fas fa-info-circle text-yellow-500 mt-1 mr-3"></i>
                                     <div class="text-sm text-yellow-700">
                                         <p class="font-medium">Important Information</p>
-                                        <p class="mt-1">By completing this booking, you agree to our terms and conditions. 
-                                        Cancellation policies may apply. Please review all details before confirming.</p>
+                                        <p class="mt-1">
+                                            By completing this booking, you agree to our terms and conditions. 
+                                            Cancellation policies may apply. Please review all details before confirming.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Submit Button -->
+                            {{-- ================
+                                 TOMBOL SUBMIT BOOKING
+                                ================ --}}
                             <button type="submit" class="w-full btn-primary-custom py-4 text-lg font-semibold rounded-lg flex items-center justify-center transition shadow-lg hover:shadow-xl">
                                 <i class="fas fa-bookmark mr-3"></i>
                                 Confirm Booking
@@ -164,9 +193,11 @@
                 </div>
             </div>
 
-            <!-- Tour Summary -->
+            {{-- =====================
+                 KOLOM KANAN: TOUR SUMMARY + CONTACT
+                 ===================== --}}
             <div class="space-y-6">
-                <!-- Tour Card -->
+                {{-- CARD RINGKASAN TOUR --}}
                 <div class="card-custom p-6">
                     <div class="flex items-center mb-4">
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-light mr-3">
@@ -175,6 +206,7 @@
                         <h2 class="text-xl font-bold text-gray-800">Tour Summary</h2>
                     </div>
                     
+                    {{-- Thumbnail tour jika tersedia --}}
                     @if($schedule->tour->thumbnail)
                     <img src="{{ asset('storage/' . $schedule->tour->thumbnail) }}" 
                          alt="{{ $schedule->tour->name }}" 
@@ -185,6 +217,7 @@
                     </div>
                     @endif
                     
+                    {{-- Info singkat tour (durasi, lokasi, tanggal, slot) --}}
                     <div class="space-y-4">
                         <div class="flex items-start">
                             <i class="fas fa-clock text-primary mt-1 mr-3"></i>
@@ -216,13 +249,14 @@
                         </div>
                     </div>
                     
+                    {{-- Deskripsi tour --}}
                     <div class="mt-6 pt-4 border-t border-gray-200">
                         <h3 class="text-sm font-medium text-gray-600 mb-2">Tour Description</h3>
                         <p class="text-sm text-gray-700 leading-relaxed">{{ $schedule->tour->description }}</p>
                     </div>
                 </div>
 
-                <!-- Help Card -->
+                {{-- CARD BANTUAN / KONTAK --}}
                 <div class="card-custom p-6 bg-blue-50 border border-blue-100">
                     <div class="flex items-center mb-3">
                         <i class="fas fa-question-circle text-blue-500 text-lg mr-2"></i>
@@ -248,33 +282,40 @@
 
 @push('scripts')
 <script>
-    // Real-time price calculation
-    const guestsInput = document.getElementById('guests');
-    const guestsCount = document.getElementById('guests-count');
-    const subtotal = document.getElementById('subtotal');
-    const totalAmount = document.getElementById('totalAmount');
+    // ================================
+    //  REAL-TIME PRICE CALCULATION
+    //  - Update subtotal & total saat jumlah tamu berubah
+    // ================================
+
+    const guestsInput   = document.getElementById('guests');
+    const guestsCount   = document.getElementById('guests-count');
+    const subtotal      = document.getElementById('subtotal');
+    const totalAmount   = document.getElementById('totalAmount');
     const pricePerGuest = {{ $schedule->tour->price }};
 
     function updatePriceCalculation() {
+        // Ambil jumlah tamu, kalau NaN fallback ke 0
         const guests = parseInt(guestsInput.value) || 0;
-        const total = guests * pricePerGuest;
+        const total  = guests * pricePerGuest;
         
-        // Update display
-        guestsCount.textContent = guests;
-        subtotal.textContent = 'Rp ' + total.toLocaleString('id-ID');
-        totalAmount.textContent = 'Rp ' + total.toLocaleString('id-ID');
+        // Update tampilan jumlah tamu dan subtotal dalam format Rupiah lokal
+        guestsCount.textContent    = guests;
+        subtotal.textContent       = 'Rp ' + total.toLocaleString('id-ID');
+        totalAmount.textContent    = 'Rp ' + total.toLocaleString('id-ID');
         
-        // Validate maximum guests
+        // Validasi maksimum tamu sesuai available_slots
         const maxGuests = {{ $schedule->available_slots }};
         if (guests > maxGuests) {
             guestsInput.value = maxGuests;
+            // Panggil ulang supaya tampilan ikut menyesuaikan
             updatePriceCalculation();
         }
     }
 
+    // Update ketika input jumlah tamu berubah
     guestsInput.addEventListener('input', updatePriceCalculation);
     
-    // Initialize on page load
+    // Inisialisasi saat halaman pertama kali dimuat
     updatePriceCalculation();
 </script>
 @endpush
